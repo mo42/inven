@@ -20,6 +20,8 @@ dependencies:
 - base >= 4.7 && < 5
 - yaml
 - time
+- filepath
+- xdg-basedir
 
 ghc-options:
 - -Wall
