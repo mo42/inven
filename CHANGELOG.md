@@ -15,3 +15,6 @@ and this project adheres to the
 ## Unreleased
 
 ## 0.1.0.0 - DATE
+
+- Add fields: date
+- Place database in XDG user dir

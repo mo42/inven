@@ -9,9 +9,9 @@ module Lib
 
 import Data.Yaml
 import Data.Time.Format
-import Data.Time.LocalTime
 import Data.Time
-import Data.Time.Calendar
+import System.FilePath ((</>))
+import System.Environment.XDG.BaseDir
 
 data Item = Item
   { itemId :: Int
@@ -40,13 +40,21 @@ parseDateOrCurrent input = do
     Just date -> return date
     Nothing   -> getCurrentDay
 
+appendToPath :: String -> IO FilePath
+appendToPath filename = do
+  filePath <- getUserDataDir "inven"
+  return (filePath </> filename)
+
 loadInventory :: IO [Item]
 loadInventory = do
-  contents <- decodeFileThrow ".inventory.yml"
+  path <- appendToPath "inventory.yml"
+  contents <- decodeFileThrow path
   return contents
 
 saveInventory :: [Item] -> IO ()
-saveInventory items = encodeFile ".inventory.yml" items
+saveInventory items = do
+  path <- appendToPath "inventory.yml"
+  encodeFile path items
 
 maxIdPlusOne :: [Item] -> Int
 maxIdPlusOne [] = 0
