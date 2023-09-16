@@ -18,3 +18,6 @@ and this project adheres to the
 
 - Add fields: date
 - Place database in XDG user dir
+- Proper parsing of arguments
+- README.md
+- Reporting function: value of items

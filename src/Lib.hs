@@ -6,7 +6,8 @@ module Lib
     , removeItem
     , parseDateOrCurrent
     , getParsedArgs
-    , Command (Add, Remove)
+    , Command (Add, Remove, Value)
+    , totalValue
     ) where
 
 import Data.Yaml
@@ -19,6 +20,7 @@ import Options.Applicative
 data Command
   = Add String String Float
   | Remove Int
+  | Value
 
 addParser :: Options.Applicative.Parser Command
 addParser = Add
@@ -33,6 +35,7 @@ mainParser :: Options.Applicative.Parser Command
 mainParser = subparser $
   command "add" (info addParser (progDesc "add an item"))
   <> command "remove" (info removeParser (progDesc "Remove an item"))
+  <> command "value" (info (pure Value) (progDesc "Sum of all values"))
 
 getParsedArgs :: IO Command
 getParsedArgs = execParser (info mainParser fullDesc)
@@ -89,3 +92,6 @@ addItem description value date inventory = inventory ++ [Item (maxIdPlusOne inve
 
 removeItem :: Int -> [Item] -> [Item]
 removeItem itemID inventory = filter (\item -> itemId item /= itemID) inventory
+
+totalValue :: [Item] -> Float
+totalValue inventory = sum $ map (\(Item _ _ value _) -> value) inventory

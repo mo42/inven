@@ -15,3 +15,6 @@ main = do
       inventory <- loadInventory
       let newInventory = removeItem itemId inventory
       saveInventory newInventory
+    Value -> do
+      inventory <- loadInventory
+      putStrLn $ show $ totalValue inventory
