@@ -34,6 +34,7 @@ library
   build-depends:
       base >=4.7 && <5
     , filepath
+    , optparse-applicative
     , time
     , xdg-basedir
     , yaml
@@ -50,6 +51,7 @@ executable inven-exe
       base >=4.7 && <5
     , filepath
     , inven
+    , optparse-applicative
     , time
     , xdg-basedir
     , yaml
@@ -67,6 +69,7 @@ test-suite inven-test
       base >=4.7 && <5
     , filepath
     , inven
+    , optparse-applicative
     , time
     , xdg-basedir
     , yaml

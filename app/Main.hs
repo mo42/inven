@@ -1,23 +1,17 @@
 module Main (main) where
 
 import Lib
-import System.Environment (getArgs)
 
 main :: IO ()
 main = do
-  args <- getArgs
-  case args of
-    ("add" : "-t" : description : "-v" : valueStr : "-d" : dateStr : []) -> do
-      let value = read valueStr :: Float
+  parsedArgs <- getParsedArgs
+  case parsedArgs of
+    Add description itemDate itemValue -> do
       inventory <- loadInventory
-      date <- parseDateOrCurrent dateStr
-      let newInventory = addItem description value date inventory
+      date <- parseDateOrCurrent itemDate
+      let newInventory = addItem description itemValue date inventory
       saveInventory newInventory
-
-    ("remove" : itemIDStr : []) -> do
-      let itemID = read itemIDStr :: Int
+    Remove itemId -> do
       inventory <- loadInventory
-      let newInventory = removeItem itemID inventory
+      let newInventory = removeItem itemId inventory
       saveInventory newInventory
-
-    _ -> putStrLn "Invalid arguments"

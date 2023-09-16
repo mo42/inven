@@ -5,6 +5,8 @@ module Lib
     , addItem
     , removeItem
     , parseDateOrCurrent
+    , getParsedArgs
+    , Command (Add, Remove)
     ) where
 
 import Data.Yaml
@@ -12,6 +14,28 @@ import Data.Time.Format
 import Data.Time
 import System.FilePath ((</>))
 import System.Environment.XDG.BaseDir
+import Options.Applicative
+
+data Command
+  = Add String String Float
+  | Remove Int
+
+addParser :: Options.Applicative.Parser Command
+addParser = Add
+    <$> strOption (long "text" <> metavar "description" <> help "Textual description of the item to add")
+    <*> strOption (long "date" <> metavar "date" <> value "" <> help "Date of the item to add")
+    <*> option auto (long "value" <> metavar "value" <> value 0.0 <> help "Value of the item to add (default: 0.0)")
+
+removeParser :: Options.Applicative.Parser Command
+removeParser = Remove <$> argument auto (metavar "ID")
+
+mainParser :: Options.Applicative.Parser Command
+mainParser = subparser $
+  command "add" (info addParser (progDesc "add an item"))
+  <> command "remove" (info removeParser (progDesc "Remove an item"))
+
+getParsedArgs :: IO Command
+getParsedArgs = execParser (info mainParser fullDesc)
 
 data Item = Item
   { itemId :: Int
