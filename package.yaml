@@ -22,6 +22,7 @@ dependencies:
 - time
 - filepath
 - xdg-basedir
+- optparse-applicative
 
 ghc-options:
 - -Wall
