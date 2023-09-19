@@ -21,3 +21,4 @@ and this project adheres to the
 - Proper parsing of arguments
 - README.md
 - Reporting function: value of items
+- Correctly use Maybe for optional arguments
