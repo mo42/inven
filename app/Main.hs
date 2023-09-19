@@ -6,10 +6,10 @@ main :: IO ()
 main = do
   parsedArgs <- getParsedArgs
   case parsedArgs of
-    Add description itemDate itemValue -> do
+    Add description itemDate itemValue itemPrice -> do
       inventory <- loadInventory
       date <- parseDateOrCurrent itemDate
-      let newInventory = addItem description itemValue date inventory
+      let newInventory = addItem description itemValue itemPrice date inventory
       saveInventory newInventory
     Remove itemId -> do
       inventory <- loadInventory

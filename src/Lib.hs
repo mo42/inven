@@ -18,7 +18,7 @@ import System.Environment.XDG.BaseDir
 import Options.Applicative
 
 data Command
-  = Add String String Float
+  = Add String String Float (Maybe Float)
   | Remove Int
   | Value
 
@@ -27,6 +27,7 @@ addParser = Add
     <$> strOption (long "text" <> metavar "description" <> help "Textual description of the item to add")
     <*> strOption (long "date" <> metavar "date" <> value "" <> help "Date of the item to add")
     <*> option auto (long "value" <> metavar "value" <> value 0.0 <> help "Value of the item to add (default: 0.0)")
+    <*> (optional $ option auto (long "price" <> metavar "price" <> help "Optional price of the item"))
 
 removeParser :: Options.Applicative.Parser Command
 removeParser = Remove <$> argument auto (metavar "ID")
@@ -44,17 +45,19 @@ data Item = Item
   { itemId :: Int
   , itemDescription :: String
   , itemValue :: Float
+  , itemPrice :: Maybe Float
   , itemDate :: Day
   } deriving (Show, Eq)
 
 instance ToJSON Item where
-  toJSON (Item id desc val date) = object ["id" .= id, "description" .= desc, "value" .= val, "date" .= date]
+  toJSON (Item id desc val price date) = object ["id" .= id, "description" .= desc, "value" .= val, "price" .= price, "date" .= date]
 
 instance FromJSON Item where
   parseJSON = withObject "Item" $ \v -> Item
     <$> v .: "id"
     <*> v .: "description"
     <*> v .: "value"
+    <*> v .:? "price"
     <*> v .: "date"
 
 getCurrentDay :: IO Day
@@ -87,11 +90,11 @@ maxIdPlusOne :: [Item] -> Int
 maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
-addItem :: String -> Float -> Day -> [Item] -> [Item]
-addItem description value date inventory = inventory ++ [Item (maxIdPlusOne inventory) description value date]
+addItem :: String -> Float -> Maybe Float -> Day -> [Item] -> [Item]
+addItem description value price date inventory = inventory ++ [Item (maxIdPlusOne inventory) description value price date]
 
 removeItem :: Int -> [Item] -> [Item]
 removeItem itemID inventory = filter (\item -> itemId item /= itemID) inventory
 
 totalValue :: [Item] -> Float
-totalValue inventory = sum $ map (\(Item _ _ value _) -> value) inventory
+totalValue inventory = sum $ map (\(Item _ _ value _ _) -> value) inventory
