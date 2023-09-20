@@ -18,7 +18,7 @@ import System.Environment.XDG.BaseDir
 import Options.Applicative
 
 data Command
-  = Add String String (Maybe Float) (Maybe Float)
+  = Add String String Int (Maybe Float) (Maybe Float)
   | Remove Int
   | Value
 
@@ -26,6 +26,7 @@ addParser :: Options.Applicative.Parser Command
 addParser = Add
     <$> strOption (long "text" <> metavar "description" <> help "Textual description of the item to add")
     <*> strOption (long "date" <> metavar "date" <> value "" <> help "Date of the item to add")
+    <*> option auto (long "quantity" <> metavar "quantity" <> value 1 <> help "Number of items of this kind")
     <*> (optional $ option auto (long "value" <> metavar "value" <> help "Value of the item to add"))
     <*> (optional $ option auto (long "price" <> metavar "price" <> help "Optional price of the item"))
 
@@ -47,17 +48,18 @@ data Item = Item
   , itemValue :: Maybe Float
   , itemPrice :: Maybe Float
   , itemDate :: Day
+  , itemQuantity :: Int
   } deriving (Show, Eq)
 
 instance ToJSON Item where
-  toJSON (Item id desc (Just val) (Just price) date) =
-    object ["id" .= id, "description" .= desc, "value" .= val, "price" .= price, "date" .= date]
-  toJSON (Item id desc Nothing (Just price) date) =
-    object ["id" .= id, "description" .= desc, "price" .= price, "date" .= date]
-  toJSON (Item id desc (Just val) Nothing date) =
-    object ["id" .= id, "description" .= desc, "value" .= val, "date" .= date]
-  toJSON (Item id desc Nothing Nothing date) =
-    object ["id" .= id, "description" .= desc, "date" .= date]
+  toJSON (Item id desc (Just val) (Just price) date quantity) =
+    object ["id" .= id, "description" .= desc, "value" .= val, "price" .= price, "date" .= date, "quantity" .= quantity]
+  toJSON (Item id desc Nothing (Just price) date quantity) =
+    object ["id" .= id, "description" .= desc, "price" .= price, "date" .= date, "quantity" .= quantity]
+  toJSON (Item id desc (Just val) Nothing date quantity) =
+    object ["id" .= id, "description" .= desc, "value" .= val, "date" .= date, "quantity" .= quantity]
+  toJSON (Item id desc Nothing Nothing date quantity) =
+    object ["id" .= id, "description" .= desc, "date" .= date, "quantity" .= quantity]
 
 instance FromJSON Item where
   parseJSON = withObject "Item" $ \v -> Item
@@ -66,6 +68,7 @@ instance FromJSON Item where
     <*> v .:? "value"
     <*> v .:? "price"
     <*> v .: "date"
+    <*> v .: "quantity"
 
 getCurrentDay :: IO Day
 getCurrentDay = utctDay <$> getCurrentTime
@@ -97,14 +100,14 @@ maxIdPlusOne :: [Item] -> Int
 maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
-addItem :: String -> Maybe Float -> Maybe Float -> Day -> [Item] -> [Item]
-addItem description value price date inventory = inventory ++ [Item (maxIdPlusOne inventory) description value price date]
+addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> [Item] -> [Item]
+addItem description value price date quantity inventory = inventory ++ [Item (maxIdPlusOne inventory) description value price date quantity]
 
 removeItem :: Int -> [Item] -> [Item]
 removeItem itemID inventory = filter (\item -> itemId item /= itemID) inventory
 
 optItemValue :: Item -> Float
-optItemValue (Item _ _ optVal _ _) = case optVal of
+optItemValue (Item _ _ optVal _ _ _) = case optVal of
   Just val -> val
   Nothing -> 0.0
 
