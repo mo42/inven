@@ -24,11 +24,35 @@ data Command
 
 addParser :: Options.Applicative.Parser Command
 addParser = Add
-    <$> strOption (long "text" <> metavar "description" <> help "Textual description of the item to add")
-    <*> strOption (long "date" <> metavar "date" <> value "" <> help "Date of the item to add")
-    <*> option auto (long "quantity" <> metavar "quantity" <> value 1 <> help "Number of items of this kind")
-    <*> (optional $ option auto (long "value" <> metavar "value" <> help "Value of the item to add"))
-    <*> (optional $ option auto (long "price" <> metavar "price" <> help "Optional price of the item"))
+    <$> strOption
+      (long "text"
+      <> metavar "description"
+      <> help "Textual description of the item to add"
+      )
+    <*> strOption
+      (long "date"
+      <> metavar "date"
+      <> value ""
+      <> help "Date of the item to add"
+      )
+    <*> option auto
+      (long "quantity"
+      <> metavar "quantity"
+      <> value 1
+      <> help "Number of items of this kind"
+      )
+    <*> (optional $ option auto
+          (long "value"
+          <> metavar "value"
+          <> help "Value of the item to add"
+          )
+        )
+    <*> (optional $ option auto
+          (long "price"
+          <> metavar "price"
+          <> help "Optional price of the item"
+          )
+        )
 
 removeParser :: Options.Applicative.Parser Command
 removeParser = Remove <$> argument auto (metavar "ID")
@@ -53,13 +77,33 @@ data Item = Item
 
 instance ToJSON Item where
   toJSON (Item id desc (Just val) (Just price) date quantity) =
-    object ["id" .= id, "description" .= desc, "value" .= val, "price" .= price, "date" .= date, "quantity" .= quantity]
+    object ["id" .= id
+           , "description" .= desc
+           , "value" .= val
+           , "price" .= price
+           , "date" .= date
+           , "quantity" .= quantity
+           ]
   toJSON (Item id desc Nothing (Just price) date quantity) =
-    object ["id" .= id, "description" .= desc, "price" .= price, "date" .= date, "quantity" .= quantity]
+    object ["id" .= id
+           , "description" .= desc
+           , "price" .= price
+           , "date" .= date
+           , "quantity" .= quantity
+           ]
   toJSON (Item id desc (Just val) Nothing date quantity) =
-    object ["id" .= id, "description" .= desc, "value" .= val, "date" .= date, "quantity" .= quantity]
+    object ["id" .= id
+           , "description" .= desc
+           , "value" .= val
+           , "date" .= date
+           , "quantity" .= quantity
+           ]
   toJSON (Item id desc Nothing Nothing date quantity) =
-    object ["id" .= id, "description" .= desc, "date" .= date, "quantity" .= quantity]
+    object ["id" .= id
+           , "description" .= desc
+           , "date" .= date
+           , "quantity" .= quantity
+           ]
 
 instance FromJSON Item where
   parseJSON = withObject "Item" $ \v -> Item
@@ -101,7 +145,8 @@ maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
 addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> [Item] -> [Item]
-addItem description value price date quantity inventory = inventory ++ [Item (maxIdPlusOne inventory) description value price date quantity]
+addItem description value price date quantity inventory =
+  inventory ++ [Item (maxIdPlusOne inventory) description value price date quantity]
 
 removeItem :: Int -> [Item] -> [Item]
 removeItem itemID inventory = filter (\item -> itemId item /= itemID) inventory
