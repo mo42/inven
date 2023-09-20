@@ -50,7 +50,14 @@ data Item = Item
   } deriving (Show, Eq)
 
 instance ToJSON Item where
-  toJSON (Item id desc val price date) = object ["id" .= id, "description" .= desc, "value" .= val, "price" .= price, "date" .= date]
+  toJSON (Item id desc (Just val) (Just price) date) =
+    object ["id" .= id, "description" .= desc, "value" .= val, "price" .= price, "date" .= date]
+  toJSON (Item id desc Nothing (Just price) date) =
+    object ["id" .= id, "description" .= desc, "price" .= price, "date" .= date]
+  toJSON (Item id desc (Just val) Nothing date) =
+    object ["id" .= id, "description" .= desc, "value" .= val, "date" .= date]
+  toJSON (Item id desc Nothing Nothing date) =
+    object ["id" .= id, "description" .= desc, "date" .= date]
 
 instance FromJSON Item where
   parseJSON = withObject "Item" $ \v -> Item
