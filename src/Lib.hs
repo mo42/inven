@@ -18,7 +18,7 @@ import System.Environment.XDG.BaseDir
 import Options.Applicative
 
 data Command
-  = Add String String Float (Maybe Float)
+  = Add String String (Maybe Float) (Maybe Float)
   | Remove Int
   | Value
 
@@ -26,7 +26,7 @@ addParser :: Options.Applicative.Parser Command
 addParser = Add
     <$> strOption (long "text" <> metavar "description" <> help "Textual description of the item to add")
     <*> strOption (long "date" <> metavar "date" <> value "" <> help "Date of the item to add")
-    <*> option auto (long "value" <> metavar "value" <> value 0.0 <> help "Value of the item to add (default: 0.0)")
+    <*> (optional $ option auto (long "value" <> metavar "value" <> help "Value of the item to add"))
     <*> (optional $ option auto (long "price" <> metavar "price" <> help "Optional price of the item"))
 
 removeParser :: Options.Applicative.Parser Command
@@ -44,7 +44,7 @@ getParsedArgs = execParser (info mainParser fullDesc)
 data Item = Item
   { itemId :: Int
   , itemDescription :: String
-  , itemValue :: Float
+  , itemValue :: Maybe Float
   , itemPrice :: Maybe Float
   , itemDate :: Day
   } deriving (Show, Eq)
@@ -56,7 +56,7 @@ instance FromJSON Item where
   parseJSON = withObject "Item" $ \v -> Item
     <$> v .: "id"
     <*> v .: "description"
-    <*> v .: "value"
+    <*> v .:? "value"
     <*> v .:? "price"
     <*> v .: "date"
 
@@ -90,11 +90,16 @@ maxIdPlusOne :: [Item] -> Int
 maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
-addItem :: String -> Float -> Maybe Float -> Day -> [Item] -> [Item]
+addItem :: String -> Maybe Float -> Maybe Float -> Day -> [Item] -> [Item]
 addItem description value price date inventory = inventory ++ [Item (maxIdPlusOne inventory) description value price date]
 
 removeItem :: Int -> [Item] -> [Item]
 removeItem itemID inventory = filter (\item -> itemId item /= itemID) inventory
 
+optItemValue :: Item -> Float
+optItemValue (Item _ _ optVal _ _) = case optVal of
+  Just val -> val
+  Nothing -> 0.0
+
 totalValue :: [Item] -> Float
-totalValue inventory = sum $ map (\(Item _ _ value _ _) -> value) inventory
+totalValue inventory = sum $ map optItemValue inventory
