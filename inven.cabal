@@ -35,6 +35,7 @@ library
       base >=4.7 && <5
     , filepath
     , optparse-applicative
+    , process
     , time
     , xdg-basedir
     , yaml
@@ -52,6 +53,7 @@ executable inven
     , filepath
     , inven
     , optparse-applicative
+    , process
     , time
     , xdg-basedir
     , yaml
@@ -70,6 +72,7 @@ test-suite inven-test
     , filepath
     , inven
     , optparse-applicative
+    , process
     , time
     , xdg-basedir
     , yaml

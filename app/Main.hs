@@ -1,5 +1,7 @@
 module Main (main) where
 
+import System.Process
+import System.Exit
 import Lib
 
 main :: IO ()
@@ -18,3 +20,11 @@ main = do
     Value -> do
       inventory <- loadInventory
       putStrLn $ show $ totalValue inventory
+    Edit itemId -> do
+      path <- appendToPath "inventory.yml"
+      let command = "nvim +/\"id: " ++ show itemId ++ "\" " ++ path
+      (_, _, _, processHandle) <- createProcess (shell command)
+      exitCode <- waitForProcess processHandle
+      case exitCode of
+        ExitSuccess -> putStrLn $ "Opened file at id: " ++ show itemId
+        ExitFailure _ -> putStrLn "Could not open inventory in NeoVim"

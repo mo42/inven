@@ -23,6 +23,7 @@ dependencies:
 - filepath
 - xdg-basedir
 - optparse-applicative
+- process
 
 ghc-options:
 - -Wall
