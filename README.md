@@ -10,7 +10,7 @@ stack install
 ```
 
 If you have `.local/bin` in your PATH environment variable, you should be able
-to run the `inven` command`
+to run the `inven` command.
 
 ## Usage
 
