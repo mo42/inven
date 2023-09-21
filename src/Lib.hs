@@ -6,8 +6,9 @@ module Lib
     , removeItem
     , parseDateOrCurrent
     , getParsedArgs
-    , Command (Add, Remove, Value)
+    , Command (Add, Remove, Value, Edit)
     , totalValue
+    , appendToPath
     ) where
 
 import Data.Yaml
@@ -21,6 +22,7 @@ data Command
   = Add String String Int (Maybe Float) (Maybe Float)
   | Remove Int
   | Value
+  | Edit Int
 
 addParser :: Options.Applicative.Parser Command
 addParser = Add
@@ -57,11 +59,15 @@ addParser = Add
 removeParser :: Options.Applicative.Parser Command
 removeParser = Remove <$> argument auto (metavar "ID")
 
+editParser :: Options.Applicative.Parser Command
+editParser = Edit <$> argument auto (metavar "ID")
+
 mainParser :: Options.Applicative.Parser Command
 mainParser = subparser $
   command "add" (info addParser (progDesc "add an item"))
   <> command "remove" (info removeParser (progDesc "Remove an item"))
   <> command "value" (info (pure Value) (progDesc "Sum of all values"))
+  <> command "edit" (info editParser (progDesc "Edit item in Vim manually"))
 
 getParsedArgs :: IO Command
 getParsedArgs = execParser (info mainParser fullDesc)

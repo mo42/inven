@@ -22,3 +22,4 @@ and this project adheres to the
 - README.md
 - Reporting function: value of items
 - Correctly use Maybe for optional arguments
+- Edit subcommand to directly change inventory file
