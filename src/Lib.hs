@@ -82,43 +82,43 @@ data Item = Item
   } deriving (Show, Eq)
 
 instance ToJSON Item where
-  toJSON (Item id desc (Just val) (Just price) date quantity) =
-    object ["id" .= id
+  toJSON (Item itemId desc (Just val) (Just price) date qty) =
+    object [ "id" .= itemId
            , "description" .= desc
            , "value" .= val
            , "price" .= price
            , "date" .= date
-           , "quantity" .= quantity
+           , "quantity" .= qty
            ]
-  toJSON (Item id desc Nothing (Just price) date quantity) =
-    object ["id" .= id
+  toJSON (Item itemId desc Nothing (Just price) date qty) =
+    object [ "id" .= itemId
            , "description" .= desc
            , "price" .= price
            , "date" .= date
-           , "quantity" .= quantity
+           , "quantity" .= qty
            ]
-  toJSON (Item id desc (Just val) Nothing date quantity) =
-    object ["id" .= id
+  toJSON (Item itemId desc (Just val) Nothing date qty) =
+    object [ "id" .= itemId
            , "description" .= desc
            , "value" .= val
            , "date" .= date
-           , "quantity" .= quantity
+           , "quantity" .= qty
            ]
-  toJSON (Item id desc Nothing Nothing date quantity) =
-    object ["id" .= id
+  toJSON (Item itemId desc Nothing Nothing date qty) =
+    object [ "id" .= itemId
            , "description" .= desc
            , "date" .= date
-           , "quantity" .= quantity
+           , "quantity" .= qty
            ]
 
 instance FromJSON Item where
   parseJSON = withObject "Item" $ \v -> Item
-    <$> v .: "id"
-    <*> v .: "description"
+    <$> v .:  "id"
+    <*> v .:  "description"
     <*> v .:? "value"
     <*> v .:? "price"
-    <*> v .: "date"
-    <*> v .: "quantity"
+    <*> v .:  "date"
+    <*> v .:  "quantity"
 
 getCurrentDay :: IO Day
 getCurrentDay = utctDay <$> getCurrentTime
@@ -151,8 +151,8 @@ maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
 addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> [Item] -> [Item]
-addItem description value price date quantity inventory =
-  inventory ++ [Item (maxIdPlusOne inventory) description value price date quantity]
+addItem desc val price date qty inventory =
+  inventory ++ [Item (maxIdPlusOne inventory) desc val price date qty]
 
 removeItem :: Int -> [Item] -> [Item]
 removeItem itemID inventory = filter (\item -> itemId item /= itemID) inventory
