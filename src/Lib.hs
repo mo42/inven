@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE RecordWildCards #-}
 module Lib
     ( loadInventory
     , saveInventory
@@ -66,13 +67,13 @@ editParser = Edit <$> argument auto (metavar "ID")
 
 mainParser :: Options.Applicative.Parser Command
 mainParser = subparser $
-  command "add" (info addParser (progDesc "add an item"))
+  command "add" (info addParser (progDesc "Add an item"))
   <> command "remove" (info removeParser (progDesc "Remove an item"))
   <> command "value" (info (pure Value) (progDesc "Sum of all values"))
   <> command "edit" (info editParser (progDesc "Edit item in Vim manually"))
 
 getParsedArgs :: IO Command
-getParsedArgs = execParser (info mainParser fullDesc)
+getParsedArgs = execParser $ info mainParser fullDesc
 
 data Item = Item
   { itemId :: Int
@@ -125,7 +126,7 @@ removeItem :: Int -> [Item] -> [Item]
 removeItem removeItemId inventory = filter (\item -> itemId item /= removeItemId) inventory
 
 optItemValue :: Item -> Float
-optItemValue (Item _ _ optVal _ _ _) = case optVal of
+optItemValue Item { value = optVal} = case optVal of
   Just val -> val
   Nothing -> 0.0
 
