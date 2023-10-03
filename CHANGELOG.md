@@ -14,7 +14,7 @@ and this project adheres to the
 
 ## Initial release
 
-## 0.1.0.1 - 2023-10-03
+### 0.1.0.1 - 2023-10-03
 
 - Add optional fields: date, quantity
 - Add optional fields: price, value, and category
@@ -24,3 +24,9 @@ and this project adheres to the
 - Correctly use Maybe for optional arguments
 - Value subcommand to see total value of items
 - Edit subcommand to directly change inventory file
+
+## Unreleased
+
+### 0.1.0.2 - DATE
+
+- Count subcommand to see number of items in inventory
