@@ -8,18 +8,19 @@ and this project adheres to the
 
 ## Init
 
-## 0.1.0.0 - 2023-09-03
+### 0.1.0.0 - 2023-09-03
 
 - Initial super-basic inventory command
 
-## Unreleased
+## Initial release
 
-## 0.1.0.0 - DATE
+## 0.1.0.1 - 2023-10-03
 
-- Add fields: date
+- Add optional fields: date, quantity
+- Add optional fields: price, value, and category
 - Place database in XDG user dir
 - Proper parsing of arguments
 - README.md
-- Reporting function: value of items
 - Correctly use Maybe for optional arguments
+- Value subcommand to see total value of items
 - Edit subcommand to directly change inventory file

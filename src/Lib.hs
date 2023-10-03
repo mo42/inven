@@ -22,7 +22,7 @@ import Options.Applicative
 import GHC.Generics
 
 data Command
-  = Add String String Int (Maybe Float) (Maybe Float)
+  = Add String String Int (Maybe Float) (Maybe Float) (Maybe String)
   | Remove Int
   | Value
   | Edit Int
@@ -58,6 +58,12 @@ addParser = Add
           <> help "Optional price of the item"
           )
         )
+    <*> (optional $ strOption
+          (long "category"
+          <> metavar "category"
+          <> help "Optional category of the item"
+          )
+        )
 
 removeParser :: Options.Applicative.Parser Command
 removeParser = Remove <$> argument auto (metavar "ID")
@@ -82,6 +88,7 @@ data Item = Item
   , price :: Maybe Float
   , date :: Day
   , quantity :: Int
+  , category :: Maybe String
   } deriving (Generic, Show)
 
 instance ToJSON Item
@@ -118,9 +125,9 @@ maxIdPlusOne :: [Item] -> Int
 maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
-addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> [Item] -> [Item]
-addItem desc val price date qty inventory =
-  inventory ++ [Item (maxIdPlusOne inventory) desc val price date qty]
+addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> Maybe String -> [Item] -> [Item]
+addItem desc val price date qty cat inventory =
+  inventory ++ [Item (maxIdPlusOne inventory) desc val price date qty cat]
 
 removeItem :: Int -> [Item] -> [Item]
 removeItem removeItemId inventory = filter (\item -> itemId item /= removeItemId) inventory
