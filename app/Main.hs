@@ -20,6 +20,9 @@ main = do
     Value -> do
       inventory <- loadInventory
       putStrLn $ show $ totalValue inventory
+    Count -> do
+      inventory <- loadInventory
+      putStrLn $ show $ count inventory
     Edit itemId -> do
       path <- appendToPath "inventory.yml"
       let command = "nvim +/\"id: " ++ show itemId ++ "\" " ++ path

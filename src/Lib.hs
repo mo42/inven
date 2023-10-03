@@ -8,8 +8,9 @@ module Lib
     , removeItem
     , parseDateOrCurrent
     , getParsedArgs
-    , Command (Add, Remove, Value, Edit)
+    , Command (Add, Remove, Value, Count, Edit)
     , totalValue
+    , count
     , appendToPath
     ) where
 
@@ -25,6 +26,7 @@ data Command
   = Add String String Int (Maybe Float) (Maybe Float) (Maybe String)
   | Remove Int
   | Value
+  | Count
   | Edit Int
 
 addParser :: Options.Applicative.Parser Command
@@ -76,6 +78,7 @@ mainParser = subparser $
   command "add" (info addParser (progDesc "Add an item"))
   <> command "remove" (info removeParser (progDesc "Remove an item"))
   <> command "value" (info (pure Value) (progDesc "Sum of all values"))
+  <> command "count" (info (pure Count) (progDesc "Number of items"))
   <> command "edit" (info editParser (progDesc "Edit item in Vim manually"))
 
 getParsedArgs :: IO Command
@@ -139,3 +142,6 @@ optItemValue Item { value = optVal} = case optVal of
 
 totalValue :: [Item] -> Float
 totalValue inventory = sum $ map optItemValue inventory
+
+count :: [Item] -> Int
+count inventory = length inventory
