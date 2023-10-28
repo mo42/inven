@@ -8,9 +8,10 @@ module Lib
     , removeItem
     , parseDateOrCurrent
     , getParsedArgs
-    , Command (Add, Remove, Value, Count, Edit)
+    , Command (Add, Remove, Value, Count, Edit, Consume)
     , totalValue
     , count
+    , consume
     , appendToPath
     ) where
 
@@ -27,6 +28,7 @@ data Command
   | Remove Int
   | Value
   | Count
+  | Consume Int
   | Edit Int
 
 addParser :: Options.Applicative.Parser Command
@@ -73,6 +75,9 @@ removeParser = Remove <$> argument auto (metavar "ID")
 editParser :: Options.Applicative.Parser Command
 editParser = Edit <$> argument auto (metavar "ID")
 
+consumeParser :: Options.Applicative.Parser Command
+consumeParser = Consume <$> argument auto (metavar "ID")
+
 mainParser :: Options.Applicative.Parser Command
 mainParser = subparser $
   command "add" (info addParser (progDesc "Add an item"))
@@ -80,6 +85,7 @@ mainParser = subparser $
   <> command "value" (info (pure Value) (progDesc "Sum of all values"))
   <> command "count" (info (pure Count) (progDesc "Number of items"))
   <> command "edit" (info editParser (progDesc "Edit item in Vim manually"))
+  <> command "consume" (info consumeParser (progDesc "Consume item (ie, decrement quantity)"))
 
 getParsedArgs :: IO Command
 getParsedArgs = execParser $ info mainParser fullDesc
@@ -145,3 +151,13 @@ totalValue inventory = sum $ map optItemValue inventory
 
 count :: [Item] -> Int
 count inventory = length inventory
+
+decrementValue :: Item -> Item
+decrementValue item = item { quantity = quantity item - 1 }
+
+consume :: [Item] -> Int -> [Item]
+consume inventory consumeId = map applyConsumeItem inventory
+  where
+    applyConsumeItem item
+      | itemId item == consumeId = decrementValue item
+      | otherwise = item
