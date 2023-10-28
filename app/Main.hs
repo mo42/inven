@@ -31,3 +31,7 @@ main = do
       case exitCode of
         ExitSuccess -> putStrLn $ "Opened file at id: " ++ show itemId
         ExitFailure _ -> putStrLn "Could not open inventory in NeoVim"
+    Consume itemId -> do
+      inventory <- loadInventory
+      let newInventory = consume inventory itemId
+      saveInventory newInventory
