@@ -28,7 +28,7 @@ main = do
     Count -> do
       inventory <- loadInventory
       putStrLn $ show $ count inventory
-    Edit itemId -> do
+    Edit -> do
       path <- appendToPath "inventory.yml"
       maybeEditor <- lookupEnv "EDITOR"
       let command = getEditor maybeEditor ++ " " ++ path
