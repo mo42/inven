@@ -29,7 +29,7 @@ data Command
   | Value
   | Count
   | Consume Int
-  | Edit Int
+  | Edit
 
 addParser :: Options.Applicative.Parser Command
 addParser = Add
@@ -72,9 +72,6 @@ addParser = Add
 removeParser :: Options.Applicative.Parser Command
 removeParser = Remove <$> argument auto (metavar "ID")
 
-editParser :: Options.Applicative.Parser Command
-editParser = Edit <$> argument auto (metavar "ID")
-
 consumeParser :: Options.Applicative.Parser Command
 consumeParser = Consume <$> argument auto (metavar "ID")
 
@@ -84,7 +81,7 @@ mainParser = subparser $
   <> command "remove" (info removeParser (progDesc "Remove an item"))
   <> command "value" (info (pure Value) (progDesc "Sum of all values"))
   <> command "count" (info (pure Count) (progDesc "Number of items"))
-  <> command "edit" (info editParser (progDesc "Edit item in Vim manually"))
+  <> command "edit" (info (pure Edit) (progDesc "Edit item in editor manually"))
   <> command "consume" (info consumeParser (progDesc "Consume item (ie, decrement quantity)"))
 
 getParsedArgs :: IO Command
