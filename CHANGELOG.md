@@ -32,3 +32,4 @@ and this project adheres to the
 - Count subcommand to see number of items in inventory
 - Consume subcommand to reflect use of quantity
 - Refined README.md
+- Fix value function considers quantities

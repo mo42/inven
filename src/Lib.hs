@@ -139,15 +139,18 @@ removeItem :: Int -> [Item] -> [Item]
 removeItem removeItemId inventory = filter (\item -> itemId item /= removeItemId) inventory
 
 optItemValue :: Item -> Float
-optItemValue Item { value = optVal, price = optPrice} = case  optVal of
+optItemValue Item { value = optVal, price = optPrice } = case  optVal of
     Just val -> val
     Nothing ->
       case optPrice of
         Just pr -> pr
         Nothing -> 0.0
 
+totalItemValue :: Item -> Float
+totalItemValue item = (\Item { quantity = q } -> fromIntegral q) item * optItemValue item
+
 totalValue :: [Item] -> Float
-totalValue inventory = sum $ map optItemValue inventory
+totalValue inventory = sum $ map totalItemValue inventory
 
 count :: [Item] -> Int
 count inventory = length inventory
