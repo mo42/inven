@@ -30,4 +30,5 @@ and this project adheres to the
 ### 0.1.0.2 - DATE
 
 - Count subcommand to see number of items in inventory
-- Consume subcommand to reflect use of quantiAtesty
+- Consume subcommand to reflect use of quantity
+- Refined README.md
