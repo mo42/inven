@@ -8,10 +8,11 @@ module Lib
     , removeItem
     , parseDateOrCurrent
     , getParsedArgs
-    , Command (Add, Remove, Value, Count, Edit, Consume)
+    , Command (Add, Remove, Value, Count, Edit, Consume, Prune)
     , totalValue
     , count
     , consume
+    , prune
     , appendToPath
     ) where
 
@@ -29,6 +30,7 @@ data Command
   | Value
   | Count
   | Consume Int
+  | Prune
   | Edit
 
 addParser :: Options.Applicative.Parser Command
@@ -83,6 +85,7 @@ mainParser = subparser $
   <> command "count" (info (pure Count) (progDesc "Number of items"))
   <> command "edit" (info (pure Edit) (progDesc "Edit item in editor manually"))
   <> command "consume" (info consumeParser (progDesc "Consume item (ie, decrement quantity)"))
+  <> command "prune" (info (pure Prune) (progDesc "Clear items from database where quantity is zero"))
 
 getParsedArgs :: IO Command
 getParsedArgs = execParser $ info mainParser fullDesc
@@ -164,3 +167,6 @@ consume inventory consumeId = map applyConsumeItem inventory
     applyConsumeItem item
       | itemId item == consumeId = decrementValue item
       | otherwise = item
+
+prune :: [Item] -> [Item]
+prune inventory = filter (\item -> quantity item /= 0) inventory

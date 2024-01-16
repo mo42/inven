@@ -33,3 +33,4 @@ and this project adheres to the
 - Consume subcommand to reflect use of quantity
 - Refined README.md
 - Fix value function considers quantities
+- Prune subcommand to delete entries with zero quantity
