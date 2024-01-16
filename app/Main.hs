@@ -4,6 +4,7 @@ import Lib
 import System.Environment
 import System.Exit
 import System.Process
+import Text.Printf
 
 getEditor :: Maybe String -> String
 getEditor (Just editor) = editor
@@ -44,3 +45,8 @@ main = do
       inventory <- loadInventory
       let newInventory = consume inventory itemId
       saveInventory newInventory
+    Prune -> do
+      inventory <- loadInventory
+      let newInventory = prune inventory
+      saveInventory newInventory
+      printf "Pruned %d items with zero quantity.\n" (length inventory - length newInventory)
