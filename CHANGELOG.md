@@ -18,7 +18,7 @@ and this project adheres to the
 
 - Add optional fields: date, quantity
 - Add optional fields: price, value, and category
-- Place database in XDG user dir
+- Place database in XDG user directory
 - Proper parsing of arguments
 - README.md
 - Correctly use Maybe for optional arguments
@@ -34,3 +34,4 @@ and this project adheres to the
 - Refined README.md
 - Fix value function considers quantities
 - Prune subcommand to delete entries with zero quantity
+- Show subcommand to print entries by ID
