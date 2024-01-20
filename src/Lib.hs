@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module Lib
     ( loadInventory
     , saveInventory
@@ -8,12 +10,14 @@ module Lib
     , removeItem
     , parseDateOrCurrent
     , getParsedArgs
-    , Command (Add, Remove, Value, Count, Edit, Consume, Prune)
+    , Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show)
     , totalValue
     , count
     , consume
     , prune
+    , findItemById
     , appendToPath
+    , formatItem
     ) where
 
 import Data.Yaml
@@ -23,6 +27,7 @@ import System.FilePath ((</>))
 import System.Environment.XDG.BaseDir
 import Options.Applicative
 import GHC.Generics
+import Text.Printf
 
 data Command
   = Add String String Int (Maybe Float) (Maybe Float) (Maybe String)
@@ -32,6 +37,7 @@ data Command
   | Consume Int
   | Prune
   | Edit
+  | Show Int
 
 addParser :: Options.Applicative.Parser Command
 addParser = Add
@@ -77,6 +83,9 @@ removeParser = Remove <$> argument auto (metavar "ID")
 consumeParser :: Options.Applicative.Parser Command
 consumeParser = Consume <$> argument auto (metavar "ID")
 
+showParser :: Options.Applicative.Parser Command
+showParser = Show <$> argument auto (metavar "ID")
+
 mainParser :: Options.Applicative.Parser Command
 mainParser = subparser $
   command "add" (info addParser (progDesc "Add an item"))
@@ -86,6 +95,7 @@ mainParser = subparser $
   <> command "edit" (info (pure Edit) (progDesc "Edit item in editor manually"))
   <> command "consume" (info consumeParser (progDesc "Consume item (ie, decrement quantity)"))
   <> command "prune" (info (pure Prune) (progDesc "Clear items from database where quantity is zero"))
+  <> command "show" (info showParser (progDesc "Show item"))
 
 getParsedArgs :: IO Command
 getParsedArgs = execParser $ info mainParser fullDesc
@@ -170,3 +180,42 @@ consume inventory consumeId = map applyConsumeItem inventory
 
 prune :: [Item] -> [Item]
 prune inventory = filter (\item -> quantity item /= 0) inventory
+
+findItemById :: [Item] -> Int -> Maybe Item
+findItemById [] _ = Nothing
+findItemById (item:items) targetId
+  | itemId item == targetId = Just item
+  | otherwise = findItemById items targetId
+
+instance PrintfArg Day where
+  formatArg day fmt
+    | fmtChar fmt == 'D' = formatString (formatTime defaultTimeLocale "%Y-%m-%d" day) (fmt { fmtChar = 's' })
+    | otherwise = error "Unsupported format specifier for type Day"
+
+
+fromMaybe :: Show a => Maybe a -> String
+fromMaybe (Just a) = show a
+fromMaybe Nothing = "none"
+
+instance PrintfArg (Maybe String) where
+  formatArg mayStr fmt = formatString (fromMaybe mayStr) fmt
+
+instance PrintfArg (Maybe Float) where
+  formatArg mayFloat fmt
+    | fmtChar fmt == 'F' = formatString (fromMaybe mayFloat) (fmt { fmtChar = 's'})
+    | otherwise = error "Unsupported format specifier for type Maybe Float"
+
+formatItem :: Item -> String
+formatItem (Item _ desc val price date qty cat) =
+    printf ("%s\n"
+      ++ "- category: %s\n"
+      ++ "- purchased: %D\n"
+      ++ "- value: %F\n"
+      ++ "- price: %F\n"
+      ++ "- quantity: %d\n" )
+      desc
+      cat
+      date
+      val
+      price
+      qty
