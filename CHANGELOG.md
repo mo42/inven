@@ -35,3 +35,4 @@ and this project adheres to the
 - Fix value function considers quantities
 - Prune subcommand to delete entries with zero quantity
 - Show subcommand to print entries by ID
+- Find subcommand to search for items with regular expressions

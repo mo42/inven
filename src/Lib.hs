@@ -10,24 +10,28 @@ module Lib
     , removeItem
     , parseDateOrCurrent
     , getParsedArgs
-    , Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show)
+    , Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show, Find)
     , totalValue
     , count
     , consume
     , prune
     , findItemById
+    , findItemByRegex
     , appendToPath
     , formatItem
+    , formatItemShort
     ) where
 
-import Data.Yaml
-import Data.Time.Format
+import Data.Maybe
 import Data.Time
-import System.FilePath ((</>))
-import System.Environment.XDG.BaseDir
-import Options.Applicative
+import Data.Time.Format
+import Data.Yaml
 import GHC.Generics
+import Options.Applicative
+import System.Environment.XDG.BaseDir
+import System.FilePath ((</>))
 import Text.Printf
+import Text.Regex.Posix
 
 data Command
   = Add String String Int (Maybe Float) (Maybe Float) (Maybe String)
@@ -38,6 +42,7 @@ data Command
   | Prune
   | Edit
   | Show Int
+  | Find String
 
 addParser :: Options.Applicative.Parser Command
 addParser = Add
@@ -86,9 +91,16 @@ consumeParser = Consume <$> argument auto (metavar "ID")
 showParser :: Options.Applicative.Parser Command
 showParser = Show <$> argument auto (metavar "ID")
 
+
+findParser :: Options.Applicative.Parser Command
+findParser = Find <$> strOption (long "regexp" <> metavar "search regexp"
+      <> help "Regular expression for searching in description"
+      )
+
 mainParser :: Options.Applicative.Parser Command
 mainParser = subparser $
   command "add" (info addParser (progDesc "Add an item"))
+  <> command "find" (info findParser (progDesc "Find item by reg. exp."))
   <> command "remove" (info removeParser (progDesc "Remove an item"))
   <> command "value" (info (pure Value) (progDesc "Sum of all values"))
   <> command "count" (info (pure Count) (progDesc "Number of items"))
@@ -192,17 +204,17 @@ instance PrintfArg Day where
     | fmtChar fmt == 'D' = formatString (formatTime defaultTimeLocale "%Y-%m-%d" day) (fmt { fmtChar = 's' })
     | otherwise = error "Unsupported format specifier for type Day"
 
+test :: Maybe Float -> String
+test (Just f) = show f
+test Nothing = "none"
 
-fromMaybe :: Show a => Maybe a -> String
-fromMaybe (Just a) = show a
-fromMaybe Nothing = "none"
 
 instance PrintfArg (Maybe String) where
-  formatArg mayStr fmt = formatString (fromMaybe mayStr) fmt
+  formatArg mayStr fmt = formatString (fromMaybe "none" mayStr) fmt
 
 instance PrintfArg (Maybe Float) where
   formatArg mayFloat fmt
-    | fmtChar fmt == 'F' = formatString (fromMaybe mayFloat) (fmt { fmtChar = 's'})
+    | fmtChar fmt == 'F' = formatString (maybe "none" show mayFloat) (fmt { fmtChar = 'f'})
     | otherwise = error "Unsupported format specifier for type Maybe Float"
 
 formatItem :: Item -> String
@@ -219,3 +231,17 @@ formatItem (Item _ desc val price date qty cat) =
       val
       price
       qty
+
+formatItemShort :: Item -> String
+formatItemShort (Item _ desc _ _ _ qty cat) = printf "%03d %s %s\n" qty cat desc
+
+matchMaybeString :: Maybe String -> String -> Bool
+matchMaybeString (Just str) regex = str =~ regex
+matchMaybeString Nothing _ = False
+
+matchExpression :: Item -> String -> Bool
+matchExpression item regex = description item =~ regex || matchMaybeString (category item) regex
+
+findItemByRegex :: [Item] -> String -> [Item]
+findItemByRegex [] _ = []
+findItemByRegex items regex = filter (\item -> matchExpression item regex) items
