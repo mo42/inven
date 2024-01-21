@@ -5,6 +5,7 @@ import System.Environment
 import System.Exit
 import System.Process
 import Text.Printf
+import Data.List
 
 getEditor :: Maybe String -> String
 getEditor (Just editor) = editor
@@ -56,3 +57,7 @@ main = do
       case maybeItem of
         Just item -> putStrLn $ formatItem item
         Nothing -> putStrLn "Not found"
+    Find regpex -> do
+      inventory <- loadInventory
+      let matchedItems = findItemByRegex inventory regpex
+      putStr $ intercalate "" $ map formatItemShort matchedItems

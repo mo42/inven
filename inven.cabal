@@ -39,6 +39,7 @@ library
     , time
     , xdg-basedir
     , yaml
+    , regex-posix
   default-language: Haskell2010
 
 executable inven
