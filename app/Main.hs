@@ -26,10 +26,10 @@ main = do
             saveInventory newInventory
         Value -> do
             inventory <- loadInventory
-            putStrLn $ show $ totalValue inventory
+            print (totalValue inventory)
         Count -> do
             inventory <- loadInventory
-            putStrLn $ show $ count inventory
+            print (length inventory)
         Edit -> do
             path <- appendToPath "inventory.yml"
             maybeEditor <- lookupEnv "EDITOR"
