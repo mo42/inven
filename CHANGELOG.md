@@ -25,9 +25,9 @@ and this project adheres to the
 - Value subcommand to see total value of items
 - Edit subcommand to directly change inventory file
 
-## Unreleased
+## Search and show
 
-### 0.1.0.2 - DATE
+### 0.1.0.2 - 2024-01-23
 
 - Count subcommand to see number of items in inventory
 - Consume subcommand to reflect use of quantity
@@ -36,3 +36,8 @@ and this project adheres to the
 - Prune subcommand to delete entries with zero quantity
 - Show subcommand to print entries by ID
 - Find subcommand to search for items with regular expressions
+- Add code formatter and linter to pre-commit hooks
+
+## Unreleased
+
+### 0.1.0.3 - DATE

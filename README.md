@@ -1,6 +1,5 @@
 # inven
-Keep track of all your stuff from the command line. inven (short for inventory)
-allows you to manage your physical belongings. 📦📜
+Keep track of all your stuff from the command line. Manage your physical belongings with `inven` 📦📜
 
 ## Installation
 
@@ -8,13 +7,7 @@ Build and installation requirements:
 - GHC
 - Stack
 
-Haskell dependencies:
-- filepath
-- optparse-applicative
-- process
-- time
-- xdg-basedir
-- yaml
+Haskell dependencies: filepath, optparse-applicative, process, time, xdg-basedir, yaml, regex-posix
 
 ```sh
 git clone https://github.com/mo42/inven.git && cd inven
@@ -26,15 +19,23 @@ to run the `inven` command.
 
 ## Usage
 
-Every sub-command has help information:
 ```
-$ inven add
-Missing: --text description
+$ inven --help
+Usage: inven COMMAND
 
-Usage: inven add --text description [--date date] [--quantity quantity]
-                 [--value value] [--price price] [--category category]
+Available options:
+  -h,--help                Show this help text
 
-  Add an item
+Available commands:
+  add                      Add an item
+  find                     Find item by reg. exp.
+  remove                   Remove an item
+  value                    Sum of all values
+  count                    Number of items
+  edit                     Edit item in editor manually
+  consume                  Consume item (ie, decrement quantity)
+  prune                    Clear items from database where quantity is zero
+  show                     Show item
 ```
 
 ### Add item to your inventory
@@ -50,11 +51,11 @@ inven consume 42
 inven remove 43
 ```
 
-### Other commands
+### Search Inventory Database
 ```
-inven value # print total value of inventory
-inven count # print total number of items in inventory
-inven edit # open inventory in $EDITOR for manual refinements
+$ inven find --regexp='music'
+01 music Piano Yamaha CP5
+01 sheet music Bach The Well-Tempered Clavier
 ```
 
 # License
