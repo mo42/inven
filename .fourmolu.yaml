@@ -1,0 +1,6 @@
+mode: inplace
+comma-style: leading
+import-export-style: leading
+column-limit: 80
+indentation: 2
+respectful: false
