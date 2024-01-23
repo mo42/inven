@@ -215,7 +215,7 @@ instance PrintfArg (Maybe String) where
 
 instance PrintfArg (Maybe Float) where
     formatArg mayFloat fmt
-        | fmtChar fmt == 'F' = formatString (maybe "none" show mayFloat) (fmt{fmtChar = 'f'})
+        | fmtChar fmt == 'F' = formatString (maybe "none" show mayFloat) (fmt{fmtChar = 's'})
         | otherwise = error "Unsupported format specifier for type Maybe Float"
 
 formatItem :: Item -> String
@@ -236,7 +236,7 @@ formatItem (Item _ desc val price date qty cat) =
         qty
 
 formatItemShort :: Item -> String
-formatItemShort (Item _ desc _ _ _ qty cat) = printf "%03d %s %s\n" qty cat desc
+formatItemShort (Item _ desc _ _ _ qty cat) = printf "%01d %s %s\n" qty cat desc
 
 matchMaybeString :: Maybe String -> String -> Bool
 matchMaybeString (Just str) regex = str =~ regex

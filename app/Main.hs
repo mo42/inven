@@ -55,7 +55,7 @@ main = do
             inventory <- loadInventory
             let maybeItem = findItemById inventory itemId
             case maybeItem of
-                Just item -> putStrLn $ formatItem item
+                Just item -> putStr $ formatItem item
                 Nothing -> putStrLn "Not found"
         Find regpex -> do
             inventory <- loadInventory
