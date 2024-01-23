@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 
 module Lib (
     loadInventory,
@@ -12,7 +12,6 @@ module Lib (
     getParsedArgs,
     Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show, Find),
     totalValue,
-    count,
     consume,
     prune,
     findItemById,
@@ -65,15 +64,15 @@ addParser =
                 <> Options.Applicative.value 1
                 <> help "Number of items of this kind"
             )
-        <*> ( optional $
-                option
+        <*> optional
+                (option
                     auto
                     ( long "value"
                         <> metavar "value"
                         <> help "Value of the item to add"
                     )
-            )
-        <*> ( optional $
+                    )
+        <*>  optional (
                 option
                     auto
                     ( long "price"
@@ -81,7 +80,7 @@ addParser =
                         <> help "Optional price of the item"
                     )
             )
-        <*> ( optional $
+        <*>  optional (
                 strOption
                     ( long "category"
                         <> metavar "category"
@@ -144,9 +143,7 @@ getCurrentDay = utctDay <$> getCurrentTime
 parseDateOrCurrent :: String -> IO Day
 parseDateOrCurrent input = do
     let parsedDate = parseTimeM True defaultTimeLocale "%Y-%m-%d" input :: Maybe Day
-    case parsedDate of
-        Just date -> return date
-        Nothing -> getCurrentDay
+    maybe getCurrentDay return parsedDate
 
 appendToPath :: String -> IO FilePath
 appendToPath filename = do
@@ -156,8 +153,7 @@ appendToPath filename = do
 loadInventory :: IO [Item]
 loadInventory = do
     path <- appendToPath "inventory.yml"
-    contents <- decodeFileThrow path
-    return contents
+    decodeFileThrow path
 
 saveInventory :: [Item] -> IO ()
 saveInventory items = do
@@ -172,25 +168,19 @@ addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> Maybe String ->
 addItem desc val price date qty cat inventory =
     inventory ++ [Item (maxIdPlusOne inventory) desc val price date qty cat]
 
-removeItem :: Int -> [Item] -> [Item]
-removeItem removeItemId inventory = filter (\item -> itemId item /= removeItemId) inventory
+removeItem :: Int -> ([Item] -> [Item])
+removeItem removeItemId = filter (\item -> itemId item /= removeItemId)
 
 optItemValue :: Item -> Float
 optItemValue Item{value = optVal, price = optPrice} = case optVal of
     Just val -> val
-    Nothing ->
-        case optPrice of
-            Just pr -> pr
-            Nothing -> 0.0
+    Nothing -> fromMaybe 0.0 optPrice
 
 totalItemValue :: Item -> Float
 totalItemValue item = (\Item{quantity = q} -> fromIntegral q) item * optItemValue item
 
 totalValue :: [Item] -> Float
 totalValue inventory = sum $ map totalItemValue inventory
-
-count :: [Item] -> Int
-count inventory = length inventory
 
 decrementValue :: Item -> Item
 decrementValue item = item{quantity = quantity item - 1}
@@ -202,8 +192,8 @@ consume inventory consumeId = map applyConsumeItem inventory
         | itemId item == consumeId = decrementValue item
         | otherwise = item
 
-prune :: [Item] -> [Item]
-prune inventory = filter (\item -> quantity item /= 0) inventory
+prune :: ([Item] -> [Item])
+prune = filter (\item -> quantity item /= 0)
 
 findItemById :: [Item] -> Int -> Maybe Item
 findItemById [] _ = Nothing
@@ -221,7 +211,7 @@ test (Just f) = show f
 test Nothing = "none"
 
 instance PrintfArg (Maybe String) where
-    formatArg mayStr fmt = formatString (fromMaybe "none" mayStr) fmt
+    formatArg mayStr = formatString (fromMaybe "none" mayStr)
 
 instance PrintfArg (Maybe Float) where
     formatArg mayFloat fmt
@@ -257,4 +247,4 @@ matchExpression item regex = description item =~ regex || matchMaybeString (cate
 
 findItemByRegex :: [Item] -> String -> [Item]
 findItemByRegex [] _ = []
-findItemByRegex items regex = filter (\item -> matchExpression item regex) items
+findItemByRegex items regex = filter (`matchExpression` regex) items
