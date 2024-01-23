@@ -120,7 +120,7 @@ mainParser =
             <> command "show" (info showParser (progDesc "Show item"))
 
 getParsedArgs :: IO Command
-getParsedArgs = execParser $ info mainParser fullDesc
+getParsedArgs = execParser $ info (mainParser <**> helper) fullDesc
 
 data Item = Item
     { itemId :: Int
