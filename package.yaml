@@ -24,6 +24,7 @@ dependencies:
 - xdg-basedir
 - optparse-applicative
 - process
+- regex-posix
 
 ghc-options:
 - -Wall

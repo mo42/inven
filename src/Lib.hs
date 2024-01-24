@@ -23,7 +23,6 @@ module Lib (
 
 import Data.Maybe
 import Data.Time
-import Data.Time.Format
 import Data.Yaml
 import GHC.Generics
 import Options.Applicative
@@ -89,13 +88,13 @@ addParser =
             )
 
 removeParser :: Options.Applicative.Parser Command
-removeParser = Remove <$> argument auto (metavar "ID")
+removeParser = Remove <$> argument auto (metavar "Item ID")
 
 consumeParser :: Options.Applicative.Parser Command
-consumeParser = Consume <$> argument auto (metavar "ID")
+consumeParser = Consume <$> argument auto (metavar "Item ID")
 
 showParser :: Options.Applicative.Parser Command
-showParser = Show <$> argument auto (metavar "ID")
+showParser = Show <$> argument auto (metavar "Item ID")
 
 findParser :: Options.Applicative.Parser Command
 findParser =
@@ -205,10 +204,6 @@ instance PrintfArg Day where
     formatArg day fmt
         | fmtChar fmt == 'D' = formatString (formatTime defaultTimeLocale "%Y-%m-%d" day) (fmt{fmtChar = 's'})
         | otherwise = error "Unsupported format specifier for type Day"
-
-test :: Maybe Float -> String
-test (Just f) = show f
-test Nothing = "none"
 
 instance PrintfArg (Maybe String) where
     formatArg mayStr = formatString (fromMaybe "none" mayStr)

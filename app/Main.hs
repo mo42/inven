@@ -6,10 +6,7 @@ import System.Environment
 import System.Exit
 import System.Process
 import Text.Printf
-
-getEditor :: Maybe String -> String
-getEditor (Just editor) = editor
-getEditor Nothing = "vi"
+import Data.Maybe
 
 main :: IO ()
 main = do
@@ -33,7 +30,7 @@ main = do
         Edit -> do
             path <- appendToPath "inventory.yml"
             maybeEditor <- lookupEnv "EDITOR"
-            let command = getEditor maybeEditor ++ " " ++ path
+            let command = fromMaybe "vi" maybeEditor ++ " " ++ path
             (_, _, _, processHandle) <- createProcess (shell command)
             exitCode <- waitForProcess processHandle
             case exitCode of
@@ -57,7 +54,7 @@ main = do
             case maybeItem of
                 Just item -> putStr $ formatItem item
                 Nothing -> putStrLn "Not found"
-        Find regpex -> do
+        Find regex -> do
             inventory <- loadInventory
-            let matchedItems = findItemByRegex inventory regpex
+            let matchedItems = findItemByRegex inventory regex
             putStr $ intercalate "" $ map formatItemShort matchedItems
