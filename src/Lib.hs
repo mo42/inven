@@ -15,7 +15,7 @@ module Lib (
     consume,
     prune,
     findItemById,
-    findItemByRegex,
+    findItemsByRegex,
     appendToPath,
     formatItem,
     formatItemShort,
@@ -240,6 +240,5 @@ matchMaybeString Nothing _ = False
 matchExpression :: Item -> String -> Bool
 matchExpression item regex = description item =~ regex || matchMaybeString (category item) regex
 
-findItemByRegex :: [Item] -> String -> [Item]
-findItemByRegex [] _ = []
-findItemByRegex items regex = filter (`matchExpression` regex) items
+findItemsByRegex :: String -> ([Item] -> [Item])
+findItemsByRegex regex = filter (`matchExpression` regex)

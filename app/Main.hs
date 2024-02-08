@@ -56,5 +56,5 @@ main = do
                 Nothing -> putStrLn "Not found"
         Find regex -> do
             inventory <- loadInventory
-            let matchedItems = findItemByRegex inventory regex
+            let matchedItems = findItemsByRegex regex inventory
             putStr $ intercalate "" $ map formatItemShort matchedItems
