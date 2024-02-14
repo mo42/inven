@@ -30,6 +30,7 @@ import System.Environment.XDG.BaseDir
 import System.FilePath ((</>))
 import Text.Printf
 import Text.Regex.Posix
+import Control.Exception (try, catch, SomeException)
 
 data Command
     = Add String String Int (Maybe Float) (Maybe Float) (Maybe String)
@@ -151,8 +152,19 @@ appendToPath filename = do
 
 loadInventory :: IO [Item]
 loadInventory = do
-    path <- appendToPath "inventory.yml"
-    decodeFileThrow path
+    filePath <- appendToPath "inventory.yml"
+    result <- tryDecode filePath `catch` handleYamlError
+    case result of
+        Left _   -> return []
+        Right items -> return items
+    where
+        tryDecode :: FilePath -> IO (Either SomeException [Item])
+        tryDecode = try . decodeFileThrow
+
+        handleYamlError :: SomeException -> IO (Either SomeException [Item])
+        handleYamlError err = do
+            putStrLn $ "Error while reading YAML file: " ++ show err
+            return $ Left err
 
 saveInventory :: [Item] -> IO ()
 saveInventory items = do
