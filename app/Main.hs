@@ -10,22 +10,19 @@ import Data.Maybe
 
 main :: IO ()
 main = do
+    inventory <- loadInventory
     parsedArgs <- getParsedArgs
     case parsedArgs of
         Add description itemDate quantity itemValue itemPrice itemCategory -> do
-            inventory <- loadInventory
             date <- parseDateOrCurrent itemDate
             let newInventory = addItem description itemValue itemPrice date quantity itemCategory inventory
             saveInventory newInventory
         Remove itemId -> do
-            inventory <- loadInventory
             let newInventory = removeItem itemId inventory
             saveInventory newInventory
         Value -> do
-            inventory <- loadInventory
             print (totalValue inventory)
         Count -> do
-            inventory <- loadInventory
             print (length inventory)
         Edit -> do
             path <- appendToPath "inventory.yml"
@@ -40,21 +37,17 @@ main = do
                     putStrLn "Could not open inventory in editor"
                     exitFailure
         Consume itemId -> do
-            inventory <- loadInventory
             let newInventory = consume inventory itemId
             saveInventory newInventory
         Prune -> do
-            inventory <- loadInventory
             let newInventory = prune inventory
             saveInventory newInventory
             printf "Pruned %d items with zero quantity.\n" (length inventory - length newInventory)
         Show itemId -> do
-            inventory <- loadInventory
             let maybeItem = findItemById inventory itemId
             case maybeItem of
                 Just item -> putStr $ formatItem item
                 Nothing -> putStrLn "Not found"
         Find regex -> do
-            inventory <- loadInventory
             let matchedItems = findItemsByRegex regex inventory
             putStr $ intercalate "" $ map formatItemShort matchedItems
