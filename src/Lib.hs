@@ -243,7 +243,7 @@ formatItem (Item _ desc val price date qty cat) =
         qty
 
 formatItemShort :: Item -> String
-formatItemShort (Item _ desc _ _ _ qty cat) = printf "%01d %s %s\n" qty cat desc
+formatItemShort (Item itemId desc _ _ _ _ cat) = printf "%01d %s %s\n" itemId cat desc
 
 matchMaybeString :: Maybe String -> String -> Bool
 matchMaybeString (Just str) regex = str =~ regex
