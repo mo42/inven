@@ -18,6 +18,7 @@ module Lib (
     findItemsByRegex,
     appendToPath,
     formatItem,
+    headerLine,
     formatItemShort,
 ) where
 
@@ -242,8 +243,23 @@ formatItem (Item _ desc val price date qty cat) =
         price
         qty
 
+headerLine :: String
+headerLine = "\ESC[4m" ++ "   ID Category             Description" ++ "\ESC[0m"
+
+padWithSpaces :: Int -> Int -> String
+padWithSpaces width n = replicate (width - length (show n)) ' ' ++ show n
+
+truncateDots :: Int -> String -> String
+truncateDots width str
+    | length str <= width = str ++ replicate (width - length str) ' '
+    | otherwise = take (width - 3) str ++ "..."
+
+transformMaybe :: (Int -> String -> String) -> Int -> Maybe String -> Maybe String
+transformMaybe f _ Nothing = Nothing
+transformMaybe f x (Just str) = Just (f x str)
+
 formatItemShort :: Item -> String
-formatItemShort (Item itemId desc _ _ _ _ cat) = printf "%01d %s %s\n" itemId cat desc
+formatItemShort (Item itemId desc _ _ _ _ cat) = printf "%s %s %s\n" (padWithSpaces 5 itemId) (transformMaybe truncateDots 20 cat) (truncateDots 30 desc)
 
 matchMaybeString :: Maybe String -> String -> Bool
 matchMaybeString (Just str) regex = str =~ regex
