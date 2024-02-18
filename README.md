@@ -53,9 +53,10 @@ inven remove 43
 
 ### Search Inventory Database
 ```
-$ inven find --regexp='music'
-01 music Piano Yamaha CP5
-01 sheet music Bach The Well-Tempered Clavier
+$ inven find --regexp="music"
+   ID Category             Description
+   01 music                Yamaha CP5
+   11 sheet music          Bach The Well-Tempered Clavier
 ```
 
 # License

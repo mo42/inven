@@ -50,4 +50,5 @@ main = do
                 Nothing -> putStrLn "Not found"
         Find regex -> do
             let matchedItems = findItemsByRegex regex inventory
+            putStrLn headerLine
             putStr $ intercalate "" $ map formatItemShort matchedItems

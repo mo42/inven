@@ -43,3 +43,4 @@ and this project adheres to the
 ### 0.1.0.3 - DATE
 
 - Find subcommand shows item ID instead of quantity
+- Refined find subcommand shows header and formats columns
