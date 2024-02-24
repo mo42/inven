@@ -22,16 +22,17 @@ module Lib (
     formatItemShort,
 ) where
 
+import Control.Exception (SomeException, catch, try)
 import Data.Maybe
 import Data.Time
 import Data.Yaml
 import GHC.Generics
-import Options.Applicative
+import Options.Applicative hiding (value)
+import qualified Options.Applicative as OA
 import System.Environment.XDG.BaseDir
 import System.FilePath ((</>))
 import Text.Printf
 import Text.Regex.Posix
-import Control.Exception (try, catch, SomeException)
 
 data Command
     = Add String String Int (Maybe Float) (Maybe Float) (Maybe String)
@@ -44,7 +45,7 @@ data Command
     | Show Int
     | Find String
 
-addParser :: Options.Applicative.Parser Command
+addParser :: OA.Parser Command
 addParser =
     Add
         <$> strOption
@@ -55,50 +56,50 @@ addParser =
         <*> strOption
             ( long "date"
                 <> metavar "date"
-                <> Options.Applicative.value ""
+                <> OA.value ""
                 <> help "Date of the item to add"
             )
         <*> option
             auto
             ( long "quantity"
                 <> metavar "quantity"
-                <> Options.Applicative.value 1
+                <> OA.value 1
                 <> help "Number of items of this kind"
             )
         <*> optional
-                (option
-                    auto
-                    ( long "value"
-                        <> metavar "value"
-                        <> help "Value of the item to add"
-                    )
-                    )
-        <*>  optional (
-                option
-                    auto
-                    ( long "price"
-                        <> metavar "price"
-                        <> help "Optional price of the item"
-                    )
+            ( option
+                auto
+                ( long "value"
+                    <> metavar "value"
+                    <> help "Value of the item to add"
+                )
             )
-        <*>  optional (
-                strOption
-                    ( long "category"
-                        <> metavar "category"
-                        <> help "Optional category of the item"
-                    )
+        <*> optional
+            ( option
+                auto
+                ( long "price"
+                    <> metavar "price"
+                    <> help "Optional price of the item"
+                )
+            )
+        <*> optional
+            ( strOption
+                ( long "category"
+                    <> metavar "category"
+                    <> help "Optional category of the item"
+                )
             )
 
-removeParser :: Options.Applicative.Parser Command
+removeParser :: OA.Parser Command
 removeParser = Remove <$> argument auto (metavar "Item ID")
 
-consumeParser :: Options.Applicative.Parser Command
+consumeParser :: OA.Parser Command
 consumeParser = Consume <$> argument auto (metavar "Item ID")
 
-showParser :: Options.Applicative.Parser Command
+showParser :: OA.Parser Command
 showParser = Show <$> argument auto (metavar "Item ID")
 
-findParser :: Options.Applicative.Parser Command
+findParser :: OA.Parser Command
 findParser =
     Find
         <$> strOption
@@ -107,7 +108,7 @@ findParser =
                 <> help "Regular expression for searching in description"
             )
 
-mainParser :: Options.Applicative.Parser Command
+mainParser :: OA.Parser Command
 mainParser =
     subparser $
         command "add" (info addParser (progDesc "Add an item"))
@@ -156,16 +157,16 @@ loadInventory = do
     filePath <- appendToPath "inventory.yml"
     result <- tryDecode filePath `catch` handleYamlError
     case result of
-        Left _   -> return []
+        Left _ -> return []
         Right items -> return items
-    where
-        tryDecode :: FilePath -> IO (Either SomeException [Item])
-        tryDecode = try . decodeFileThrow
+  where
+    tryDecode :: FilePath -> IO (Either SomeException [Item])
+    tryDecode = try . decodeFileThrow
 
-        handleYamlError :: SomeException -> IO (Either SomeException [Item])
-        handleYamlError err = do
-            putStrLn $ "Error while reading YAML file: " ++ show err
-            return $ Left err
+    handleYamlError :: SomeException -> IO (Either SomeException [Item])
+    handleYamlError err = do
+        putStrLn $ "Error while reading YAML file: " ++ show err
+        return $ Left err
 
 saveInventory :: [Item] -> IO ()
 saveInventory items = do
@@ -227,7 +228,7 @@ instance PrintfArg (Maybe Float) where
         | otherwise = error "Unsupported format specifier for type Maybe Float"
 
 formatItem :: Item -> String
-formatItem (Item _ desc val price date qty cat) =
+formatItem item =
     printf
         ( "%s\n"
             ++ "- category: %s\n"
@@ -236,12 +237,12 @@ formatItem (Item _ desc val price date qty cat) =
             ++ "- price: %F\n"
             ++ "- quantity: %d\n"
         )
-        desc
-        cat
-        date
-        val
-        price
-        qty
+        (description item)
+        (category item)
+        (date item)
+        (value item)
+        (price item)
+        (quantity item)
 
 headerLine :: String
 headerLine = "\ESC[4m" ++ "   ID Category             Description" ++ "\ESC[0m"
@@ -259,7 +260,7 @@ transformMaybe f _ Nothing = Nothing
 transformMaybe f x (Just str) = Just (f x str)
 
 formatItemShort :: Item -> String
-formatItemShort (Item itemId desc _ _ _ _ cat) = printf "%s %s %s\n" (padWithSpaces 5 itemId) (transformMaybe truncateDots 20 cat) (truncateDots 30 desc)
+formatItemShort item = printf "%s %s %s\n" (padWithSpaces 5 (itemId item)) (transformMaybe truncateDots 20 (category item)) (truncateDots 30 (description item))
 
 matchMaybeString :: Maybe String -> String -> Bool
 matchMaybeString (Just str) regex = str =~ regex
