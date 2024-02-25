@@ -13,9 +13,9 @@ main = do
     inventory <- loadInventory
     parsedArgs <- getParsedArgs
     case parsedArgs of
-        Add description itemDate quantity itemValue itemPrice itemCategory -> do
+        Add description itemDate quantity itemValue itemPrice itemCategory itemContainer -> do
             date <- parseDateOrCurrent itemDate
-            let newInventory = addItem description itemValue itemPrice date quantity itemCategory inventory
+            let newInventory = addItem description itemValue itemPrice date quantity itemCategory itemContainer inventory
             saveInventory newInventory
         Remove itemId -> do
             let newInventory = removeItem itemId inventory
