@@ -38,11 +38,25 @@ Available commands:
   show                     Show item
 ```
 
+
 ### Add item to your inventory
+
+#### Examples
 ```sh
 inven add --text="Some item description"
 inven add --text="Some item description" --value=42.42 --date=2023-07-01
 ```
+
+#### Required and optional parameters or attributes
+```sh
+$ inven add
+Missing: --text description
+
+Usage: inven add --text description [--date date] [--quantity quantity]
+                 [--value value] [--price price] [--category category]
+                 [--container container] [--location location]
+```
+
 
 ### Remove or consume item from inventory by ID
 Consume means that used up one piece (ie, the quantity is decremented). Remove means that the entire record is deleted.
