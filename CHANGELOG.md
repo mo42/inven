@@ -44,4 +44,5 @@ and this project adheres to the
 
 - Find subcommand shows item ID instead of quantity
 - Refined find subcommand shows header and formats columns
-- Container attribute to specify where an item is located
+- Container attribute to specify in which container an item is located
+- Location attribute to specify were an item is located
