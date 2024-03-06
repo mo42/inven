@@ -1,21 +1,21 @@
 module Main (main) where
 
 import Data.List
+import Data.Maybe
 import Lib
 import System.Environment
 import System.Exit
 import System.Process
 import Text.Printf
-import Data.Maybe
 
 main :: IO ()
 main = do
     inventory <- loadInventory
     parsedArgs <- getParsedArgs
     case parsedArgs of
-        Add description itemDate quantity itemValue itemPrice itemCategory itemContainer -> do
+        Add description itemDate quantity itemValue itemPrice itemCategory itemContainer itemLocation -> do
             date <- parseDateOrCurrent itemDate
-            let newInventory = addItem description itemValue itemPrice date quantity itemCategory itemContainer inventory
+            let newInventory = addItem description itemValue itemPrice date quantity itemCategory itemContainer itemLocation inventory
             saveInventory newInventory
         Remove itemId -> do
             let newInventory = removeItem itemId inventory
