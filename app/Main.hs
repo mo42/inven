@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Data.List
+import Data.List (intercalate)
 import Data.Maybe
 import Lib
 import System.Environment

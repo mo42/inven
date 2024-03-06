@@ -267,19 +267,19 @@ padWithSpaces :: Int -> Int -> String
 padWithSpaces width n = replicate (width - length (show n)) ' ' ++ show n
 
 truncateDots :: Int -> String -> String
-truncateDots width str
-    | length str <= width = str ++ replicate (width - length str) ' '
-    | otherwise = take (width - 3) str ++ "..."
+truncateDots width string
+    | length string <= width = string ++ replicate (width - length string) ' '
+    | otherwise = take (width - 3) string ++ "..."
 
 transformMaybe :: (Int -> String -> String) -> Int -> Maybe String -> Maybe String
-transformMaybe f _ Nothing = Nothing
-transformMaybe f x (Just str) = Just (f x str)
+transformMaybe _ _ Nothing = Nothing
+transformMaybe f x (Just s) = Just (f x s)
 
 formatItemShort :: Item -> String
 formatItemShort item = printf "%s %s %s\n" (padWithSpaces 5 (itemId item)) (transformMaybe truncateDots 20 (category item)) (truncateDots 30 (description item))
 
 matchMaybeString :: Maybe String -> String -> Bool
-matchMaybeString (Just str) regex = str =~ regex
+matchMaybeString (Just s) regex = s =~ regex
 matchMaybeString Nothing _ = False
 
 matchExpression :: Item -> String -> Bool
