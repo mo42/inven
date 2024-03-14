@@ -23,6 +23,7 @@ module Lib (
 ) where
 
 import Control.Exception (SomeException, catch, try)
+import Data.Char (toLower)
 import Data.Maybe
 import Data.Time
 import Data.Yaml
@@ -278,12 +279,15 @@ transformMaybe f x (Just s) = Just (f x s)
 formatItemShort :: Item -> String
 formatItemShort item = printf "%s %s %s\n" (padWithSpaces 5 (itemId item)) (transformMaybe truncateDots 20 (category item)) (truncateDots 30 (description item))
 
-matchMaybeString :: Maybe String -> String -> Bool
-matchMaybeString (Just s) regex = s =~ regex
-matchMaybeString Nothing _ = False
+matchCaseInsensitive :: String -> String -> Bool
+matchCaseInsensitive s regex = map toLower s =~ map toLower regex
+
+matchCaseInsensitiveMaybeString :: Maybe String -> String -> Bool
+matchCaseInsensitiveMaybeString (Just s) regex = matchCaseInsensitive s regex
+matchCaseInsensitiveMaybeString Nothing _ = False
 
 matchExpression :: Item -> String -> Bool
-matchExpression item regex = description item =~ regex || matchMaybeString (category item) regex
+matchExpression item regex = matchCaseInsensitive (description item) regex || matchCaseInsensitiveMaybeString (category item) regex
 
 findItemsByRegex :: String -> ([Item] -> [Item])
 findItemsByRegex regex = filter (`matchExpression` regex)
