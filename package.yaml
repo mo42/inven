@@ -25,6 +25,8 @@ dependencies:
 - optparse-applicative
 - process
 - regex-posix
+- text
+- bytestring
 
 ghc-options:
 - -Wall

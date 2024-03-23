@@ -33,10 +33,12 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , bytestring
     , filepath
     , optparse-applicative
     , process
     , regex-posix
+    , text
     , time
     , xdg-basedir
     , yaml
@@ -51,11 +53,13 @@ executable inven
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
     , filepath
     , inven
     , optparse-applicative
     , process
     , regex-posix
+    , text
     , time
     , xdg-basedir
     , yaml
@@ -71,11 +75,13 @@ test-suite inven-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
     , filepath
     , inven
     , optparse-applicative
     , process
     , regex-posix
+    , text
     , time
     , xdg-basedir
     , yaml
