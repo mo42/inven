@@ -23,10 +23,15 @@ module Lib (
 ) where
 
 import Control.Exception (SomeException, catch, try)
+import qualified Data.ByteString.Char8 as DBS
 import Data.Char (toLower)
+import Data.Function (on)
+import Data.List (elemIndex)
 import Data.Maybe
+import Data.Text (pack)
 import Data.Time
 import Data.Yaml
+import Data.Yaml.Pretty
 import GHC.Generics
 import Options.Applicative hiding (value)
 import qualified Options.Applicative as OA
@@ -188,7 +193,23 @@ loadInventory = do
 saveInventory :: [Item] -> IO ()
 saveInventory items = do
     path <- appendToPath "inventory.yml"
-    encodeFile path items
+    DBS.writeFile path (encodePretty opts items)
+  where
+    opts = setConfCompare (compare `on` fieldIndex) defConfig
+    fieldIndex s = fromMaybe (length fields) $ s `elemIndex` fields
+    fields =
+        map
+            pack
+            [ "itemId"
+            , "category"
+            , "description"
+            , "container"
+            , "location"
+            , "date"
+            , "value"
+            , "price"
+            , "quantity"
+            ]
 
 maxIdPlusOne :: [Item] -> Int
 maxIdPlusOne [] = 0
