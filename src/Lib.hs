@@ -41,7 +41,7 @@ import Text.Printf
 import Text.Regex.Posix
 
 data Command
-    = Add String String Int (Maybe Float) (Maybe Float) (Maybe String) (Maybe String) (Maybe String)
+    = Add String String Int (Maybe Float) (Maybe Float) (Maybe String) (Maybe String) (Maybe String) (Maybe String)
     | Remove Int
     | Value
     | Count
@@ -109,6 +109,13 @@ addParser =
                     <> help "Optional location where this item is located"
                 )
             )
+        <*> optional
+            ( strOption
+                ( long "expiry"
+                    <> metavar "expiry"
+                    <> help "Expiration Date of the item"
+                )
+            )
 
 removeParser :: OA.Parser Command
 removeParser = Remove <$> argument auto (metavar "Item ID")
@@ -154,6 +161,7 @@ data Item = Item
     , category :: Maybe String
     , container :: Maybe String
     , location :: Maybe String
+    , expiry :: Maybe String
     }
     deriving (Generic, Show)
 
@@ -215,9 +223,9 @@ maxIdPlusOne :: [Item] -> Int
 maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
-addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> Maybe String -> Maybe String -> Maybe String -> [Item] -> [Item]
-addItem desc val price date qty cat cont loc inventory =
-    inventory ++ [Item (maxIdPlusOne inventory) desc val price date qty cat cont loc]
+addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> [Item] -> [Item]
+addItem desc val price date qty cat cont loc exp inventory =
+    inventory ++ [Item (maxIdPlusOne inventory) desc val price date qty cat cont loc exp]
 
 removeItem :: Int -> ([Item] -> [Item])
 removeItem removeItemId = filter (\item -> itemId item /= removeItemId)
