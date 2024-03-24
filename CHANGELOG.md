@@ -32,7 +32,7 @@ and this project adheres to the
 - Count subcommand to see number of items in inventory
 - Consume subcommand to reflect use of quantity
 - Refined README.md
-- Fix value function considers quantities
+- Fix value function that considers quantities
 - Prune subcommand to delete entries with zero quantity
 - Show subcommand to print entries by ID
 - Find subcommand to search for items with regular expressions
