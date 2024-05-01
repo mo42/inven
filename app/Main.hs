@@ -2,6 +2,7 @@ module Main (main) where
 
 import Data.List (intercalate)
 import Data.Maybe
+import Data.Time
 import Lib
 import System.Environment
 import System.Exit
@@ -52,3 +53,8 @@ main = do
       let matchedItems = findItemsByRegex regex inventory
       putStrLn headerLine
       putStr $ intercalate "" $ map formatItemShort matchedItems
+    Expired -> do
+      today <- utctDay <$> getCurrentTime
+      let expiredItems = findExpiredItems today inventory
+      putStrLn headerLine
+      putStr $ intercalate "" $ map formatItemShort expiredItems
