@@ -48,3 +48,4 @@ and this project adheres to the
 - Location attribute to specify were an item is located
 - Save keys in a specific and useful order
 - Expiry attribute to capture when an item expires (e.g., drugs)
+- Expiry attribute as a date so that expired items can be listed
