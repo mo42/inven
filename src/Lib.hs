@@ -9,6 +9,7 @@ module Lib
   , addItem
   , removeItem
   , parseDateOrCurrent
+  , parseMaybeDate
   , getParsedArgs
   , Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show, Find)
   , totalValue
@@ -162,7 +163,7 @@ data Item = Item
   , category :: Maybe String
   , container :: Maybe String
   , location :: Maybe String
-  , expiry :: Maybe String
+  , expiry :: Maybe Day
   }
   deriving (Generic, Show)
 
@@ -174,9 +175,13 @@ getCurrentDay :: IO Day
 getCurrentDay = utctDay <$> getCurrentTime
 
 parseDateOrCurrent :: String -> IO Day
-parseDateOrCurrent input = do
-  let parsedDate = parseTimeM True defaultTimeLocale "%Y-%m-%d" input :: Maybe Day
+parseDateOrCurrent str = do
+  let parsedDate = parseTimeM True defaultTimeLocale "%Y-%m-%d" str :: Maybe Day
   maybe getCurrentDay return parsedDate
+
+parseMaybeDate :: Maybe String -> Maybe Day
+parseMaybeDate Nothing = Nothing
+parseMaybeDate (Just str) = parseTimeM True defaultTimeLocale "%Y-%m-%d" str :: Maybe Day
 
 appendToPath :: String -> IO FilePath
 appendToPath filename = do
@@ -224,7 +229,7 @@ maxIdPlusOne :: [Item] -> Int
 maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
-addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> Maybe String -> Maybe String -> Maybe String -> Maybe String -> [Item] -> [Item]
+addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> Maybe String -> Maybe String -> Maybe String -> Maybe Day -> [Item] -> [Item]
 addItem desc val price date qty cat cont loc exp inventory =
   inventory ++ [Item (maxIdPlusOne inventory) desc val price date qty cat cont loc exp]
 

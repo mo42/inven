@@ -15,7 +15,7 @@ main = do
   case parsedArgs of
     Add description itemDate quantity itemValue itemPrice itemCategory itemContainer itemLocation itemExpiry -> do
       date <- parseDateOrCurrent itemDate
-      let newInventory = addItem description itemValue itemPrice date quantity itemCategory itemContainer itemLocation itemExpiry inventory
+      let newInventory = addItem description itemValue itemPrice date quantity itemCategory itemContainer itemLocation (parseMaybeDate itemExpiry) inventory
       saveInventory newInventory
     Remove itemId -> do
       let newInventory = removeItem itemId inventory
