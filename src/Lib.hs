@@ -131,22 +131,22 @@ findParser :: OA.Parser Command
 findParser =
   Find
     <$> strOption
-      ( long "regexp"
-          <> metavar "search regexp"
-          <> help "Regular expression for searching in description"
+      ( long "regex"
+          <> metavar "search regex"
+          <> help "Regular expression for searching in description and category"
       )
 
 mainParser :: OA.Parser Command
 mainParser =
   subparser $
-    command "add" (info addParser (progDesc "Add an item"))
+    command "add" (info addParser (progDesc "Add item"))
       <> command "find" (info findParser (progDesc "Find item by reg. exp."))
-      <> command "remove" (info removeParser (progDesc "Remove an item"))
+      <> command "remove" (info removeParser (progDesc "Remove item"))
       <> command "value" (info (pure Value) (progDesc "Sum of all values"))
       <> command "count" (info (pure Count) (progDesc "Number of items"))
-      <> command "edit" (info (pure Edit) (progDesc "Edit item in editor manually"))
-      <> command "consume" (info consumeParser (progDesc "Consume item (ie, decrement quantity)"))
-      <> command "prune" (info (pure Prune) (progDesc "Clear items from database where quantity is zero"))
+      <> command "edit" (info (pure Edit) (progDesc "Edit items in editor manually"))
+      <> command "consume" (info consumeParser (progDesc "Consume item (i.e., decrement quantity)"))
+      <> command "prune" (info (pure Prune) (progDesc "Clear items where quantity is zero"))
       <> command "show" (info showParser (progDesc "Show item"))
 
 getParsedArgs :: IO Command
