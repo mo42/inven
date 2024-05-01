@@ -49,3 +49,4 @@ and this project adheres to the
 - Save keys in a specific and useful order
 - Expiry attribute to capture when an item expires (e.g., drugs)
 - Expiry attribute as a date so that expired items can be listed
+- Expired subcommand to list expired items

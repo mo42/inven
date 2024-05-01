@@ -11,12 +11,13 @@ module Lib
   , parseDateOrCurrent
   , parseMaybeDate
   , getParsedArgs
-  , Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show, Find)
+  , Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show, Find, Expired)
   , totalValue
   , consume
   , prune
   , findItemById
   , findItemsByRegex
+  , findExpiredItems
   , appendToPath
   , formatItem
   , headerLine
@@ -52,6 +53,7 @@ data Command
   | Edit
   | Show Int
   | Find String
+  | Expired
 
 addParser :: OA.Parser Command
 addParser =
@@ -149,6 +151,7 @@ mainParser =
       <> command "consume" (info consumeParser (progDesc "Consume item (i.e., decrement quantity)"))
       <> command "prune" (info (pure Prune) (progDesc "Clear items where quantity is zero"))
       <> command "show" (info showParser (progDesc "Show item"))
+      <> command "expired" (info (pure Expired) (progDesc "List expired items"))
 
 getParsedArgs :: IO Command
 getParsedArgs = execParser $ info (mainParser <**> helper) fullDesc
@@ -223,6 +226,7 @@ saveInventory items = do
       , "value"
       , "price"
       , "quantity"
+      , "expiry"
       ]
 
 maxIdPlusOne :: [Item] -> Int
@@ -326,3 +330,10 @@ matchExpression item regex = matchCaseInsensitive (description item) regex || ma
 
 findItemsByRegex :: String -> ([Item] -> [Item])
 findItemsByRegex regex = filter (`matchExpression` regex)
+
+findExpiredItems :: Day -> ([Item] -> [Item])
+findExpiredItems today = filter $ isExpiredItem today
+ where
+  isExpiredItem today item = case expiry item of
+    Just day -> day <= today
+    Nothing -> False
