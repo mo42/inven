@@ -38,6 +38,7 @@ library
     , optparse-applicative
     , process
     , regex-posix
+    , table-layout
     , text
     , time
     , xdg-basedir
@@ -59,6 +60,7 @@ executable inven
     , optparse-applicative
     , process
     , regex-posix
+    , table-layout
     , text
     , time
     , xdg-basedir
@@ -81,6 +83,7 @@ test-suite inven-test
     , optparse-applicative
     , process
     , regex-posix
+    , table-layout
     , text
     , time
     , xdg-basedir
