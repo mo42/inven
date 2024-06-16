@@ -1,6 +1,5 @@
 module Main (main) where
 
-import Data.List (intercalate)
 import Data.Maybe
 import Data.Time
 import Lib
@@ -47,14 +46,12 @@ main = do
     Show itemId -> do
       let maybeItem = findItemById inventory itemId
       case maybeItem of
-        Just item -> putStr $ formatItem item
+        Just item -> putStrLn $ formatTable [item]
         Nothing -> putStrLn "Not found"
     Find regex -> do
       let matchedItems = findItemsByRegex regex inventory
-      putStrLn headerLine
-      putStr $ intercalate "" $ map formatItemShort matchedItems
+      putStrLn $ formatTable matchedItems
     Expired -> do
       today <- utctDay <$> getCurrentTime
       let expiredItems = findExpiredItems today inventory
-      putStrLn headerLine
-      putStr $ intercalate "" $ map formatItemShort expiredItems
+      putStrLn $ formatTable expiredItems

@@ -27,6 +27,7 @@ dependencies:
 - regex-posix
 - text
 - bytestring
+- table-layout
 
 ghc-options:
 - -Wall

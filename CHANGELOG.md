@@ -50,3 +50,4 @@ and this project adheres to the
 - Expiry attribute to capture when an item expires (e.g., drugs)
 - Expiry attribute as a date so that expired items can be listed
 - Expired subcommand to list expired items
+- Show items as a formatted table

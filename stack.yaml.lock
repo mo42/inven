@@ -3,11 +3,18 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: table-layout-1.0.0.0@sha256:dc135515fac3c91bed5e628df0f4297ed91aff5e7388f6ddaf5be4b08cd6d557,7889
+    pantry-tree:
+      sha256: 616b68369f932c20649f59f4f72235128e5f3fca71ba7e9bbbd2cd9fb0514224
+      size: 2547
+  original:
+    hackage: table-layout-1.0.0.0@sha256:dc135515fac3c91bed5e628df0f4297ed91aff5e7388f6ddaf5be4b08cd6d557,7889
 snapshots:
 - completed:
+    sha256: 2fc12a405ab6f7eac73eb11a0ca5ccca0e956bd2848db780c140b7406ff9ebb5
     size: 640035
     url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/21/9.yaml
-    sha256: 2fc12a405ab6f7eac73eb11a0ca5ccca0e956bd2848db780c140b7406ff9ebb5
   original:
     url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/21/9.yaml

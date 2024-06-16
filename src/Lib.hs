@@ -19,9 +19,7 @@ module Lib
   , findItemsByRegex
   , findExpiredItems
   , appendToPath
-  , formatItem
-  , headerLine
-  , formatItemShort
+  , formatTable
   )
 where
 
@@ -31,7 +29,7 @@ import Data.Char (toLower)
 import Data.Function (on)
 import Data.List (elemIndex)
 import Data.Maybe
-import Data.Text (pack)
+import Data.Text (Text, pack)
 import Data.Time
 import Data.Yaml
 import Data.Yaml.Pretty
@@ -40,6 +38,8 @@ import Options.Applicative hiding (value)
 import qualified Options.Applicative as OA
 import System.Environment.XDG.BaseDir
 import System.FilePath ((</>))
+import Text.Layout.Table
+import Text.Layout.Table.Cell
 import Text.Printf
 import Text.Regex.Posix
 
@@ -300,23 +300,14 @@ formatItem item =
     (price item)
     (quantity item)
 
-headerLine :: String
-headerLine = "\ESC[4m" ++ "   ID Category             Description" ++ "\ESC[0m"
+headerLine :: [String]
+headerLine = ["ID", "Category", "Description"]
 
-padWithSpaces :: Int -> Int -> String
-padWithSpaces width n = replicate (width - length (show n)) ' ' ++ show n
+itemLine :: Item -> [String]
+itemLine item = [printf "%d" $ itemId item, printf "%s" $ category item, description item]
 
-truncateDots :: Int -> String -> String
-truncateDots width string
-  | length string <= width = string ++ replicate (width - length string) ' '
-  | otherwise = take (width - 3) string ++ "..."
-
-transformMaybe :: (Int -> String -> String) -> Int -> Maybe String -> Maybe String
-transformMaybe _ _ Nothing = Nothing
-transformMaybe f x (Just s) = Just (f x s)
-
-formatItemShort :: Item -> String
-formatItemShort item = printf "%s %s %s\n" (padWithSpaces 5 (itemId item)) (transformMaybe truncateDots 20 (category item)) (truncateDots 30 (description item))
+formatTable :: [Item] -> String
+formatTable items = gridString [column expand right def def, column expand left def def, column expand right def def] $ headerLine : map itemLine items
 
 matchCaseInsensitive :: String -> String -> Bool
 matchCaseInsensitive s regex = map toLower s =~ map toLower regex

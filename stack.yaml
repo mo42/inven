@@ -34,6 +34,8 @@ packages:
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
 # forks / in-progress versions pinned to a git hash. For example:
+extra-deps:
+- table-layout-1.0.0.0@sha256:dc135515fac3c91bed5e628df0f4297ed91aff5e7388f6ddaf5be4b08cd6d557,7889
 #
 # extra-deps:
 # - acme-missiles-0.3
