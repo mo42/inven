@@ -283,31 +283,32 @@ instance PrintfArg (Maybe Float) where
     | fmtChar fmt == 'F' = formatString (maybe "none" show mayFloat) (fmt{fmtChar = 's'})
     | otherwise = error "Unsupported format specifier for type Maybe Float"
 
-formatItem :: Item -> String
-formatItem item =
-  printf
-    ( "%s\n"
-        ++ "- category: %s\n"
-        ++ "- purchased: %D\n"
-        ++ "- value: %F\n"
-        ++ "- price: %F\n"
-        ++ "- quantity: %d\n"
-    )
-    (description item)
-    (category item)
-    (date item)
-    (value item)
-    (price item)
-    (quantity item)
-
 headerLine :: [String]
-headerLine = ["ID", "Category", "Description"]
+headerLine = ["ID", "Category", "Description", "Purchased", "Value", "Price", "Quantity"]
 
 itemLine :: Item -> [String]
-itemLine item = [printf "%d" $ itemId item, printf "%s" $ category item, description item]
+itemLine item =
+  [ printf "%d" $ itemId item
+  , printf "%s" $ category item
+  , description item
+  , printf "%D" $ date item
+  , printf "%F" $ value item
+  , printf "%F" $ price item
+  , printf "%d" $ quantity item
+  ]
 
 formatTable :: [Item] -> String
-formatTable items = gridString [column expand right def def, column expand left def def, column expand right def def] $ headerLine : map itemLine items
+formatTable items =
+  gridString
+    [ column expand right def def
+    , column expand left def def
+    , column expand right def def
+    , column expand right def def
+    , column expand right def def
+    , column expand right def def
+    , column expand right def def
+    ]
+    $ headerLine : map itemLine items
 
 matchCaseInsensitive :: String -> String -> Bool
 matchCaseInsensitive s regex = map toLower s =~ map toLower regex
