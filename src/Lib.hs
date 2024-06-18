@@ -11,7 +11,7 @@ module Lib
   , parseDateOrCurrent
   , parseMaybeDate
   , getParsedArgs
-  , Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show, Find, Expired)
+  , Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show, Find, Expired, List)
   , totalValue
   , consume
   , prune
@@ -53,6 +53,7 @@ data Command
   | Show Int
   | Find String
   | Expired
+  | List
 
 addParser :: OA.Parser Command
 addParser =
@@ -151,6 +152,7 @@ mainParser =
       <> command "prune" (info (pure Prune) (progDesc "Clear items where quantity is zero"))
       <> command "show" (info showParser (progDesc "Show item"))
       <> command "expired" (info (pure Expired) (progDesc "List expired items"))
+      <> command "list" (info (pure List) (progDesc "List all items"))
 
 getParsedArgs :: IO Command
 getParsedArgs = execParser $ info (mainParser <**> helper) fullDesc

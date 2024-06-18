@@ -51,3 +51,4 @@ and this project adheres to the
 - Expiry attribute as a date so that expired items can be listed
 - Expired subcommand to list expired items
 - Show items as a formatted table
+- List command to show all items
