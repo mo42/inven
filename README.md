@@ -7,8 +7,6 @@ Build and installation requirements:
 - GHC
 - Stack
 
-Haskell dependencies: filepath, optparse-applicative, process, time, xdg-basedir, yaml, regex-posix
-
 ```sh
 git clone https://github.com/mo42/inven.git && cd inven
 stack install
@@ -61,7 +59,8 @@ Usage: inven add --text description [--date date] [--quantity quantity]
 
 
 ### Remove or consume item from inventory by ID
-Consume means that used up one piece (ie, the quantity is decremented). Remove means that the entire record is deleted.
+Consume means that used up one piece (i.e., the quantity is decremented).
+Remove means that the entire record is deleted.
 ```sh
 inven consume 42
 inven remove 43
@@ -69,10 +68,10 @@ inven remove 43
 
 ### Search Inventory Database
 ```
-$ inven find --regexp="music"
-   ID Category             Description
-   01 music                Yamaha CP5
-   11 sheet music          Bach The Well-Tempered Clavier
+$ inven find --regex="music"
+ID Category                    Description  Purchased Value Price Quantity
+01 music                       Yamaha CP50 2015-10-01 450.0  none        1
+02 music    Bach The Well-Tempered Clavier 2019-04-02  none  20.0        1
 ```
 
 # License
