@@ -29,7 +29,7 @@ import Data.Char (toLower)
 import Data.Function (on)
 import Data.List (elemIndex)
 import Data.Maybe
-import Data.Text (Text, pack)
+import Data.Text (pack)
 import Data.Time
 import Data.Yaml
 import Data.Yaml.Pretty
@@ -39,7 +39,6 @@ import qualified Options.Applicative as OA
 import System.Environment.XDG.BaseDir
 import System.FilePath ((</>))
 import Text.Layout.Table
-import Text.Layout.Table.Cell
 import Text.Printf
 import Text.Regex.Posix
 
@@ -302,7 +301,7 @@ formatTable items =
   gridString
     [ column expand right def def
     , column expand left def def
-    , column expand right def def
+    , column (expandBetween 0 30) right def def
     , column expand right def def
     , column expand right def def
     , column expand right def def
