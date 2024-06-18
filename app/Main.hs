@@ -55,3 +55,5 @@ main = do
       today <- utctDay <$> getCurrentTime
       let expiredItems = findExpiredItems today inventory
       putStrLn $ formatTable expiredItems
+    List -> do
+      putStrLn $ formatTable inventory

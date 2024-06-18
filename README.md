@@ -36,6 +36,8 @@ Available commands:
   consume                  Consume item (ie, decrement quantity)
   prune                    Clear items from database where quantity is zero
   show                     Show item
+  expired                  List expired items
+  list                     List all items
 ```
 
 
