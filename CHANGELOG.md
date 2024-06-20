@@ -8,13 +8,13 @@ and this project adheres to the
 
 ## Init
 
-### 0.1.0.0 - 2023-09-03
+### 0.1.0 - 2023-09-03
 
 - Initial super-basic inventory command
 
 ## Initial release
 
-### 0.1.0.1 - 2023-10-03
+### 0.1.1 - 2023-10-03
 
 - Add optional fields: date, quantity
 - Add optional fields: price, value, and category
@@ -27,7 +27,7 @@ and this project adheres to the
 
 ## Search and show
 
-### 0.1.0.2 - 2024-01-23
+### 0.1.2 - 2024-01-23
 
 - Count subcommand to see number of items in inventory
 - Consume subcommand to reflect use of quantity
@@ -38,9 +38,9 @@ and this project adheres to the
 - Find subcommand to search for items with regular expressions
 - Add code formatter and linter to pre-commit hooks
 
-## Unreleased
+## Formatted table view, find, list, and other commands
 
-### 0.1.0.3 - DATE
+### 1.0.0 - 2024-06-20
 
 - Find subcommand shows item ID instead of quantity
 - Refined find subcommand shows header and formats columns
