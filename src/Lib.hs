@@ -42,15 +42,17 @@ import Text.Layout.Table
 import Text.Printf
 import Text.Regex.Posix
 
+type ItemId = Int
+
 data Command
-  = Add String String Int (Maybe Float) (Maybe Float) (Maybe String) (Maybe String) (Maybe String) (Maybe String)
-  | Remove Int
+  = Add String String ItemId (Maybe Float) (Maybe Float) (Maybe String) (Maybe String) (Maybe String) (Maybe String)
+  | Remove ItemId
   | Value
   | Count
-  | Consume Int
+  | Consume ItemId
   | Prune
   | Edit
-  | Show Int
+  | Show ItemId
   | Find String
   | Expired
   | List
@@ -158,12 +160,12 @@ getParsedArgs :: IO Command
 getParsedArgs = execParser $ info (mainParser <**> helper) fullDesc
 
 data Item = Item
-  { itemId :: Int
+  { itemId :: ItemId
   , description :: String
   , value :: Maybe Float
   , price :: Maybe Float
   , date :: Day
-  , quantity :: Int
+  , quantity :: ItemId
   , category :: Maybe String
   , container :: Maybe String
   , location :: Maybe String
@@ -230,15 +232,15 @@ saveInventory items = do
       , "expiry"
       ]
 
-maxIdPlusOne :: [Item] -> Int
+maxIdPlusOne :: [Item] -> ItemId
 maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
-addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> Maybe String -> Maybe String -> Maybe String -> Maybe Day -> [Item] -> [Item]
+addItem :: String -> Maybe Float -> Maybe Float -> Day -> ItemId -> Maybe String -> Maybe String -> Maybe String -> Maybe Day -> [Item] -> [Item]
 addItem desc val price date qty cat cont loc exp inventory =
   inventory ++ [Item (maxIdPlusOne inventory) desc val price date qty cat cont loc exp]
 
-removeItem :: Int -> ([Item] -> [Item])
+removeItem :: ItemId -> ([Item] -> [Item])
 removeItem removeItemId = filter (\item -> itemId item /= removeItemId)
 
 optItemValue :: Item -> Float
@@ -255,7 +257,7 @@ totalValue inventory = sum $ map totalItemValue inventory
 decrementValue :: Item -> Item
 decrementValue item = item{quantity = quantity item - 1}
 
-consume :: [Item] -> Int -> [Item]
+consume :: [Item] -> ItemId -> [Item]
 consume inventory consumeId = map applyConsumeItem inventory
  where
   applyConsumeItem item
@@ -265,7 +267,7 @@ consume inventory consumeId = map applyConsumeItem inventory
 prune :: ([Item] -> [Item])
 prune = filter (\item -> quantity item /= 0)
 
-findItemById :: [Item] -> Int -> Maybe Item
+findItemById :: [Item] -> ItemId -> Maybe Item
 findItemById [] _ = Nothing
 findItemById (item : items) targetId
   | itemId item == targetId = Just item
