@@ -28,6 +28,7 @@ dependencies:
 - text
 - bytestring
 - table-layout
+- directory
 
 ghc-options:
 - -Wall

@@ -55,6 +55,9 @@ Missing: --text description
 Usage: inven add --text description [--date date] [--quantity quantity]
                  [--value value] [--price price] [--category category]
                  [--container container] [--location location] [--expiry expiry]
+                 [--photo photo]
+
+  Add item
 ```
 
 
