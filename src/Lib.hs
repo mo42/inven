@@ -236,7 +236,7 @@ maxIdPlusOne :: [Item] -> ItemId
 maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
-addItem :: String -> Maybe Float -> Maybe Float -> Day -> ItemId -> Maybe String -> Maybe String -> Maybe String -> Maybe Day -> [Item] -> [Item]
+addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> Maybe String -> Maybe String -> Maybe String -> Maybe Day -> [Item] -> [Item]
 addItem desc val price date qty cat cont loc exp inventory =
   inventory ++ [Item (maxIdPlusOne inventory) desc val price date qty cat cont loc exp]
 
