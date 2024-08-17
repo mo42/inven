@@ -1,5 +1,5 @@
 name:                inven
-version:             0.1.0.0
+version:             1.0.0
 github:              "githubuser/inven"
 license:             MIT
 author:              "Moritz"
@@ -28,6 +28,7 @@ dependencies:
 - text
 - bytestring
 - table-layout
+- directory
 
 ghc-options:
 - -Wall

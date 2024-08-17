@@ -52,3 +52,7 @@ and this project adheres to the
 - Expired subcommand to list expired items
 - Show items as a formatted table
 - List command to show all items
+
+## Unreleased
+
+- subcommand to add photo of item to library
