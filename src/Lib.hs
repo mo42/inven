@@ -37,13 +37,12 @@ import Data.Yaml.Pretty
 import GHC.Generics
 import Options.Applicative hiding (value)
 import qualified Options.Applicative as OA
+import System.Directory (doesFileExist, renameFile)
 import System.Environment.XDG.BaseDir
-import System.FilePath ((</>))
+import System.FilePath (takeExtension, (</>))
 import Text.Layout.Table
 import Text.Printf
 import Text.Regex.Posix
-import System.Directory (doesFileExist, renameFile)
-import System.FilePath (takeExtension, (</>))
 
 type ItemId = Int
 
@@ -207,14 +206,14 @@ appendToPath filename = do
 moveFile :: Maybe FilePath -> String -> IO ()
 moveFile Nothing _ = return ()
 moveFile (Just srcPath) newFileName = do
-    fileExists <- doesFileExist srcPath
-    invenDir <- getUserDataDir "inven"
-    if fileExists
-        then do
-            let extension = takeExtension srcPath
-            let destPath = invenDir </> newFileName ++ extension
-            renameFile srcPath destPath
-        else putStrLn "Warning: photo does not exist"
+  fileExists <- doesFileExist srcPath
+  invenDir <- getUserDataDir "inven"
+  if fileExists
+    then do
+      let extension = takeExtension srcPath
+      let destPath = invenDir </> newFileName ++ extension
+      renameFile srcPath destPath
+    else putStrLn "Warning: photo does not exist"
 
 loadInventory :: IO [Item]
 loadInventory = do
@@ -261,7 +260,8 @@ maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> Maybe String -> Maybe String -> Maybe String -> Maybe Day -> [Item] -> ([Item], ItemId)
 addItem desc val price date qty cat cont loc exp inventory =
   (inventory ++ [Item itemId desc val price date qty cat cont loc exp], itemId)
-  where itemId = maxIdPlusOne inventory
+ where
+  itemId = maxIdPlusOne inventory
 
 removeItem :: ItemId -> ([Item] -> [Item])
 removeItem removeItemId = filter (\item -> itemId item /= removeItemId)
