@@ -20,6 +20,7 @@ module Lib
   , findExpiredItems
   , appendToPath
   , formatTable
+  , moveFile
   )
 where
 
@@ -41,11 +42,13 @@ import System.FilePath ((</>))
 import Text.Layout.Table
 import Text.Printf
 import Text.Regex.Posix
+import System.Directory (doesFileExist, renameFile)
+import System.FilePath (takeExtension, (</>))
 
 type ItemId = Int
 
 data Command
-  = Add String String ItemId (Maybe Float) (Maybe Float) (Maybe String) (Maybe String) (Maybe String) (Maybe String)
+  = Add String String ItemId (Maybe Float) (Maybe Float) (Maybe String) (Maybe String) (Maybe String) (Maybe String) (Maybe FilePath)
   | Remove ItemId
   | Value
   | Count
@@ -122,6 +125,13 @@ addParser =
               <> help "Expiration Date of the item"
           )
       )
+    <*> optional
+      ( strOption
+          ( long "photo"
+              <> metavar "photo"
+              <> help "Photograph of the item"
+          )
+      )
 
 removeParser :: OA.Parser Command
 removeParser = Remove <$> argument auto (metavar "Item ID")
@@ -194,6 +204,18 @@ appendToPath filename = do
   filePath <- getUserDataDir "inven"
   return (filePath </> filename)
 
+moveFile :: Maybe FilePath -> String -> IO ()
+moveFile Nothing _ = return ()
+moveFile (Just srcPath) newFileName = do
+    fileExists <- doesFileExist srcPath
+    invenDir <- getUserDataDir "inven"
+    if fileExists
+        then do
+            let extension = takeExtension srcPath
+            let destPath = invenDir </> newFileName ++ extension
+            renameFile srcPath destPath
+        else putStrLn "Warning: photo does not exist"
+
 loadInventory :: IO [Item]
 loadInventory = do
   filePath <- appendToPath "inventory.yml"
@@ -236,9 +258,10 @@ maxIdPlusOne :: [Item] -> ItemId
 maxIdPlusOne [] = 0
 maxIdPlusOne inventory = maximum (map itemId inventory) + 1
 
-addItem :: String -> Maybe Float -> Maybe Float -> Day -> ItemId -> Maybe String -> Maybe String -> Maybe String -> Maybe Day -> [Item] -> [Item]
+addItem :: String -> Maybe Float -> Maybe Float -> Day -> Int -> Maybe String -> Maybe String -> Maybe String -> Maybe Day -> [Item] -> ([Item], ItemId)
 addItem desc val price date qty cat cont loc exp inventory =
-  inventory ++ [Item (maxIdPlusOne inventory) desc val price date qty cat cont loc exp]
+  (inventory ++ [Item itemId desc val price date qty cat cont loc exp], itemId)
+  where itemId = maxIdPlusOne inventory
 
 removeItem :: ItemId -> ([Item] -> [Item])
 removeItem removeItemId = filter (\item -> itemId item /= removeItemId)
