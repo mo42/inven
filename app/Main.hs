@@ -58,3 +58,6 @@ main = do
       putStrLn $ formatTable expiredItems
     List -> do
       putStrLn $ formatTable inventory
+    Serve -> do
+      inventory <- loadInventory
+      serveInventory inventory

@@ -11,7 +11,7 @@ module Lib
   , parseDateOrCurrent
   , parseMaybeDate
   , getParsedArgs
-  , Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show, Find, Expired, List)
+  , Command (Add, Remove, Value, Count, Edit, Consume, Prune, Show, Find, Expired, List, Serve)
   , totalValue
   , consume
   , prune
@@ -21,6 +21,8 @@ module Lib
   , appendToPath
   , formatTable
   , moveFile
+  , renderInventory
+  , serveInventory
   )
 where
 
@@ -31,10 +33,13 @@ import Data.Function (on)
 import Data.List (elemIndex)
 import Data.Maybe
 import Data.Text (pack)
+import qualified Data.Text.Lazy as T
 import Data.Time
 import Data.Yaml
 import Data.Yaml.Pretty
 import GHC.Generics
+import GHC.Generics (Generic)
+import Lucid
 import Options.Applicative hiding (value)
 import qualified Options.Applicative as OA
 import System.Directory (doesFileExist, renameFile)
@@ -43,6 +48,7 @@ import System.FilePath (takeExtension, (</>))
 import Text.Layout.Table
 import Text.Printf
 import Text.Regex.Posix
+import Web.Scotty
 
 type ItemId = Int
 
@@ -58,6 +64,7 @@ data Command
   | Find String
   | Expired
   | List
+  | Serve
 
 addParser :: OA.Parser Command
 addParser =
@@ -164,6 +171,7 @@ mainParser =
       <> command "show" (info showParser (progDesc "Show item"))
       <> command "expired" (info (pure Expired) (progDesc "List expired items"))
       <> command "list" (info (pure List) (progDesc "List all items"))
+      <> command "serve" (info (pure Serve) (progDesc "Start web server for browsing inventory"))
 
 getParsedArgs :: IO Command
 getParsedArgs = execParser $ info (mainParser <**> helper) fullDesc
@@ -174,7 +182,7 @@ data Item = Item
   , value :: Maybe Float
   , price :: Maybe Float
   , date :: Day
-  , quantity :: ItemId
+  , quantity :: Int
   , category :: Maybe String
   , container :: Maybe String
   , location :: Maybe String
@@ -355,3 +363,35 @@ findExpiredItems today = filter $ isExpiredItem today
   isExpiredItem today item = case expiry item of
     Just day -> day <= today
     Nothing -> False
+
+-- Serving inventory in web browser
+
+renderItem :: Item -> Html ()
+renderItem item = tr_ $ do
+  -- td_ $ toHtml $ date item
+  -- td_ $ toHtml $ fromMaybe "none" $ category item
+  td_ $ toHtml $ description item
+  td_ $ toHtml $ show $ quantity item
+
+invenStyle = "body {  font-family: Arial, sans-serif;  margin: 20px;  background-color: #f7f7f7;}table {  width: 100%;  border-collapse: collapse;  margin: 0 auto;  background-color: #ffffff;  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);}th, td {  padding: 12px 15px;  text-align: left;  border-bottom: 1px solid #ddd;}th {  background-color: #f4f4f4;  color: #333;}tr:nth-child(even) {  background-color: #f9f9f9;}tr:hover {  background-color: #f1f1f1;}caption {  padding: 10px;  font-size: 1.2em;  font-weight: bold;  color: #333;}"
+
+renderInventory :: [Item] -> Html ()
+renderInventory items = html_ $ do
+  head_ $ do
+    title_ "Inventory Overview"
+    style_ invenStyle
+  body_ $ do
+    h1_ "Inventory"
+    table_ $ do
+      thead_ $ tr_ $ do
+        -- th_ "Inventoried"
+        -- th_ "Category"
+        th_ "Description"
+        th_ "Quantity"
+      tbody_ $ mapM_ renderItem items
+
+serveInventory :: [Item] -> IO ()
+serveInventory inventory = scotty 4200 $ do
+  get "/" $ do
+    let pageContent = renderText (renderInventory inventory)
+    html pageContent
