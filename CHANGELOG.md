@@ -56,3 +56,4 @@ and this project adheres to the
 ## Unreleased
 
 - subcommand to add photo of item to library
+- subcommand for a web server that serves inventory information

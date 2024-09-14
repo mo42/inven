@@ -29,6 +29,8 @@ dependencies:
 - bytestring
 - table-layout
 - directory
+- scotty
+- lucid
 
 ghc-options:
 - -Wall

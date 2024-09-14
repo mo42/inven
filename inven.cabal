@@ -36,9 +36,11 @@ library
     , bytestring
     , directory
     , filepath
+    , lucid
     , optparse-applicative
     , process
     , regex-posix
+    , scotty
     , table-layout
     , text
     , time
@@ -59,9 +61,11 @@ executable inven
     , directory
     , filepath
     , inven
+    , lucid
     , optparse-applicative
     , process
     , regex-posix
+    , scotty
     , table-layout
     , text
     , time
@@ -83,9 +87,11 @@ test-suite inven-test
     , directory
     , filepath
     , inven
+    , lucid
     , optparse-applicative
     , process
     , regex-posix
+    , scotty
     , table-layout
     , text
     , time
