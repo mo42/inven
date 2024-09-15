@@ -323,13 +323,22 @@ headerLine = ["ID", "Category", "Description", "Purchased", "Value", "Price", "Q
 itemLine :: Item -> [String]
 itemLine item =
   [ printf "%d" $ itemId item
-  , printf "%s" $ category item
+  , formatCategory item
   , description item
-  , printf "%D" $ date item
-  , printf "%F" $ value item
+  , formatDate item
+  , formatValue item
   , printf "%F" $ price item
   , printf "%d" $ quantity item
   ]
+
+formatCategory :: Item -> String
+formatCategory item = printf "%s" $ category item
+
+formatDate :: Item -> String
+formatDate item = printf "%D" $ date item
+
+formatValue :: Item -> String
+formatValue item = printf "%F" $ value item
 
 formatTable :: [Item] -> String
 formatTable items =
@@ -368,8 +377,9 @@ findExpiredItems today = filter $ isExpiredItem today
 
 renderItem :: Item -> Html ()
 renderItem item = tr_ $ do
-  -- td_ $ toHtml $ date item
-  -- td_ $ toHtml $ fromMaybe "none" $ category item
+  td_ $ toHtml $ formatDate item
+  td_ $ toHtml $ formatValue item
+  td_ $ toHtml $ formatCategory item
   td_ $ toHtml $ description item
   td_ $ toHtml $ show $ quantity item
 
@@ -384,8 +394,9 @@ renderInventory items = html_ $ do
     h1_ "Inventory"
     table_ $ do
       thead_ $ tr_ $ do
-        -- th_ "Inventoried"
-        -- th_ "Category"
+        th_ "Inventoried"
+        th_ "Value"
+        th_ "Category"
         th_ "Description"
         th_ "Quantity"
       tbody_ $ mapM_ renderItem items
