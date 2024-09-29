@@ -49,6 +49,8 @@ import Text.Layout.Table
 import Text.Printf
 import Text.Regex.Posix
 import Web.Scotty
+import Network.Wai.Middleware.Static
+import Control.Monad.IO.Class (liftIO)
 
 type ItemId = Int
 
@@ -378,12 +380,13 @@ findExpiredItems today = filter $ isExpiredItem today
 renderItem :: Item -> Html ()
 renderItem item = tr_ $ do
   td_ $ toHtml $ formatDate item
+  td_ $ img_ [src_ (pack $ printf "%d.jpg" (itemId item)), alt_ "Item's image"]
   td_ $ toHtml $ formatValue item
   td_ $ toHtml $ formatCategory item
   td_ $ toHtml $ description item
   td_ $ toHtml $ show $ quantity item
 
-invenStyle = "body {  font-family: Arial, sans-serif;  margin: 20px;  background-color: #f7f7f7;}table {  width: 100%;  border-collapse: collapse;  margin: 0 auto;  background-color: #ffffff;  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);}th, td {  padding: 12px 15px;  text-align: left;  border-bottom: 1px solid #ddd;}th {  background-color: #f4f4f4;  color: #333;}tr:nth-child(even) {  background-color: #f9f9f9;}tr:hover {  background-color: #f1f1f1;}caption {  padding: 10px;  font-size: 1.2em;  font-weight: bold;  color: #333;}"
+invenStyle = "body {  font-family: Arial, sans-serif;  margin: 20px;  background-color: #f7f7f7;}table {  width: 100%;  border-collapse: collapse;  margin: 0 auto;  background-color: #ffffff;  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);}th, td {  padding: 12px 15px;  text-align: left;  border-bottom: 1px solid #ddd;}th {  background-color: #f4f4f4;  color: #333;}tr:nth-child(even) {  background-color: #f9f9f9;}tr:hover {  background-color: #f1f1f1;}caption {  padding: 10px;  font-size: 1.2em;  font-weight: bold;  color: #333;} img { width: 40px; height: 60px; object-fit: cover; }"
 
 renderInventory :: [Item] -> Html ()
 renderInventory items = html_ $ do
@@ -401,8 +404,9 @@ renderInventory items = html_ $ do
         th_ "Quantity"
       tbody_ $ mapM_ renderItem items
 
-serveInventory :: [Item] -> IO ()
-serveInventory inventory = scotty 4200 $ do
+serveInventory :: [Item] -> String -> IO ()
+serveInventory inventory staticDir = scotty 4200 $ do
+  middleware $ staticPolicy (addBase staticDir)
   get "/" $ do
     let pageContent = renderText (renderInventory inventory)
     html pageContent

@@ -57,3 +57,4 @@ and this project adheres to the
 
 - subcommand to add photo of item to library
 - subcommand for a web server that serves inventory information
+- show the item's images in the served page
