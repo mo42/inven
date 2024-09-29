@@ -7,6 +7,7 @@ import System.Environment
 import System.Exit
 import System.Process
 import Text.Printf
+import System.Environment.XDG.BaseDir
 
 main :: IO ()
 main = do
@@ -59,5 +60,6 @@ main = do
     List -> do
       putStrLn $ formatTable inventory
     Serve -> do
+      staticDir <- getUserDataDir "inven"
       inventory <- loadInventory
-      serveInventory inventory
+      serveInventory inventory staticDir
