@@ -1,6 +1,9 @@
 # inven
 Keep track of all your stuff from the command line. Manage your physical belongings with `inven` 📦📜
 
+Example view in browser when running `inven serve`:
+![Example Inventory in Browser](example.png)
+
 ## Installation
 
 Build and installation requirements:
@@ -36,6 +39,7 @@ Available commands:
   show                     Show item
   expired                  List expired items
   list                     List all items
+  serve                    Start web server for browsing inventory
 ```
 
 
