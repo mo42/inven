@@ -33,7 +33,7 @@ import Data.Function (on)
 import Data.List (elemIndex)
 import Data.Maybe
 import Data.Text (pack)
-import qualified Data.Text.Lazy as T
+import qualified Data.Text as T
 import Data.Time
 import Data.Yaml
 import Data.Yaml.Pretty
@@ -377,32 +377,58 @@ findExpiredItems today = filter $ isExpiredItem today
 
 -- Serving inventory in web browser
 
-renderItem :: Item -> Html ()
-renderItem item = tr_ $ do
-  td_ $ toHtml $ formatDate item
-  td_ $ img_ [src_ (pack $ printf "%d.jpg" (itemId item)), alt_ "Item's image"]
-  td_ $ toHtml $ formatValue item
-  td_ $ toHtml $ formatCategory item
-  td_ $ toHtml $ description item
-  td_ $ toHtml $ show $ quantity item
-
-invenStyle = "body {  font-family: Arial, sans-serif;  margin: 20px;  background-color: #f7f7f7;}table {  width: 100%;  border-collapse: collapse;  margin: 0 auto;  background-color: #ffffff;  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);}th, td {  padding: 12px 15px;  text-align: left;  border-bottom: 1px solid #ddd;}th {  background-color: #f4f4f4;  color: #333;}tr:nth-child(even) {  background-color: #f9f9f9;}tr:hover {  background-color: #f1f1f1;}caption {  padding: 10px;  font-size: 1.2em;  font-weight: bold;  color: #333;} img { width: 40px; height: 60px; object-fit: cover; }"
+invenGridStyle = "\
+\  body {\
+\    font-family: Arial, sans-serif;\
+\    margin: 0;\
+\    padding: 0;\
+\    background-color: #f5f5f5;\
+\  }\
+\  h1 {\
+\    text-align: center;\
+\    padding: 20px;\
+\  }\
+\  .grid-container {\
+\    display: grid;\
+\    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));\
+\    gap: 20px;\
+\    padding: 20px;\
+\  }\
+\  .grid-item {\
+\    background-color: #fff;\
+\    border: 1px solid #ddd;\
+\    border-radius: 8px;\
+\    padding: 15px;\
+\    box-shadow: 0 4px 8px rgba(0,0,0,0.1);\
+\    transition: transform 0.2s;\
+\  }\
+\  .grid-item:hover {\
+\    transform: scale(1.05);\
+\  }\
+\  .item-image {\
+\    width: 100%;\
+\    height: auto;\
+\    border-bottom: 1px solid #ddd;\
+\    margin-bottom: 10px;\
+\  }\
+\  .item-info {\
+\    text-align: center;\
+\  }"
 
 renderInventory :: [Item] -> Html ()
 renderInventory items = html_ $ do
   head_ $ do
     title_ "Inventory Overview"
-    style_ invenStyle
+    style_ invenGridStyle
   body_ $ do
     h1_ "Inventory"
-    table_ $ do
-      thead_ $ tr_ $ do
-        th_ "Inventoried"
-        th_ "Value"
-        th_ "Category"
-        th_ "Description"
-        th_ "Quantity"
-      tbody_ $ mapM_ renderItem items
+    div_ [class_ "grid-container"] $ do
+      mapM_ renderItem items
+
+renderItem :: Item -> Html ()
+renderItem item = div_ [class_ "grid-item"] $ do
+  h3_ $ toHtml $ description item  -- Item name or title
+  img_ [src_ $ T.pack $ printf "%d.jpg" $ itemId item, alt_ "Item image", class_ "item-image"]
 
 serveInventory :: [Item] -> String -> IO ()
 serveInventory inventory staticDir = scotty 4200 $ do
