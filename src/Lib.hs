@@ -27,6 +27,7 @@ module Lib
 where
 
 import Control.Exception (SomeException, catch, try)
+import Control.Monad.IO.Class (liftIO)
 import qualified Data.ByteString.Char8 as DBS
 import Data.Char (toLower)
 import Data.Function (on)
@@ -38,10 +39,11 @@ import Data.Time
 import Data.Yaml
 import Data.Yaml.Pretty
 import GHC.Generics
-import GHC.Generics (Generic)
 import Lucid
+import Network.Wai.Middleware.Static
 import Options.Applicative hiding (value)
 import qualified Options.Applicative as OA
+import Style
 import System.Directory (doesFileExist, renameFile)
 import System.Environment.XDG.BaseDir
 import System.FilePath (takeExtension, (</>))
@@ -49,9 +51,6 @@ import Text.Layout.Table
 import Text.Printf
 import Text.Regex.Posix
 import Web.Scotty
-import Network.Wai.Middleware.Static
-import Control.Monad.IO.Class (liftIO)
-import Style
 
 type ItemId = Int
 
