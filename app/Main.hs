@@ -4,10 +4,10 @@ import Data.Maybe
 import Data.Time
 import Lib
 import System.Environment
+import System.Environment.XDG.BaseDir
 import System.Exit
 import System.Process
 import Text.Printf
-import System.Environment.XDG.BaseDir
 
 main :: IO ()
 main = do
