@@ -51,6 +51,7 @@ import Text.Regex.Posix
 import Web.Scotty
 import Network.Wai.Middleware.Static
 import Control.Monad.IO.Class (liftIO)
+import Style
 
 type ItemId = Int
 
@@ -377,44 +378,6 @@ findExpiredItems today = filter $ isExpiredItem today
 
 -- Serving inventory in web browser
 
-invenGridStyle = "\
-\  body {\
-\    font-family: Arial, sans-serif;\
-\    margin: 0;\
-\    padding: 0;\
-\    background-color: #f5f5f5;\
-\  }\
-\  h1 {\
-\    text-align: center;\
-\    padding: 20px;\
-\  }\
-\  .grid-container {\
-\    display: grid;\
-\    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));\
-\    gap: 20px;\
-\    padding: 20px;\
-\  }\
-\  .grid-item {\
-\    background-color: #fff;\
-\    border: 1px solid #ddd;\
-\    border-radius: 8px;\
-\    padding: 15px;\
-\    box-shadow: 0 4px 8px rgba(0,0,0,0.1);\
-\    transition: transform 0.2s;\
-\  }\
-\  .grid-item:hover {\
-\    transform: scale(1.05);\
-\  }\
-\  .item-image {\
-\    width: 100%;\
-\    height: auto;\
-\    border-bottom: 1px solid #ddd;\
-\    margin-bottom: 10px;\
-\  }\
-\  .item-info {\
-\    text-align: center;\
-\  }"
-
 renderInventory :: [Item] -> Html ()
 renderInventory items = html_ $ do
   head_ $ do
@@ -427,8 +390,9 @@ renderInventory items = html_ $ do
 
 renderItem :: Item -> Html ()
 renderItem item = div_ [class_ "grid-item"] $ do
-  h3_ $ toHtml $ description item  -- Item name or title
+  h3_ $ toHtml $ description item
   img_ [src_ $ T.pack $ printf "%d.jpg" $ itemId item, alt_ "Item image", class_ "item-image"]
+  p_ $ toHtml $ pack $ printf "#%d item from %s category at location %s" (quantity item) (category item) (location item)
 
 serveInventory :: [Item] -> String -> IO ()
 serveInventory inventory staticDir = scotty 4200 $ do
