@@ -1,5 +1,6 @@
 module Main (main) where
 
+import Data.IORef
 import Data.Maybe
 import Data.Time
 import Lib
@@ -62,4 +63,5 @@ main = do
     Serve -> do
       staticDir <- getUserDataDir "inven"
       inventory <- loadInventory
-      serveInventory inventory staticDir
+      inventoryRef <- newIORef inventory
+      serveInventory inventoryRef staticDir

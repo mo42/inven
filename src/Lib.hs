@@ -31,6 +31,7 @@ import Control.Monad.IO.Class (liftIO)
 import qualified Data.ByteString.Char8 as DBS
 import Data.Char (toLower)
 import Data.Function (on)
+import Data.IORef
 import Data.List (elemIndex)
 import Data.Maybe
 import Data.Text (pack)
@@ -40,6 +41,7 @@ import Data.Yaml
 import Data.Yaml.Pretty
 import GHC.Generics
 import Lucid
+import Network.HTTP.Types (badRequest400)
 import Network.Wai.Middleware.Static
 import Options.Applicative hiding (value)
 import qualified Options.Applicative as OA
@@ -49,6 +51,7 @@ import System.Environment.XDG.BaseDir
 import System.FilePath (takeExtension, (</>))
 import Text.Layout.Table
 import Text.Printf
+import Text.Read (readMaybe)
 import Text.Regex.Posix
 import Web.Scotty
 
@@ -393,9 +396,27 @@ renderItem item = div_ [class_ "grid-item"] $ do
   img_ [src_ $ T.pack $ printf "%d.jpg" $ itemId item, alt_ "Item image", class_ "item-image"]
   p_ $ toHtml $ pack $ printf "#%d item from %s category at location %s" (quantity item) (category item) (location item)
 
-serveInventory :: [Item] -> String -> IO ()
-serveInventory inventory staticDir = scotty 4200 $ do
+serveInventory :: IORef [Item] -> String -> IO ()
+serveInventory inventoryRef staticDir = scotty 4200 $ do
   middleware $ staticPolicy (addBase staticDir)
   get "/" $ do
+    inventory <- liftIO $ readIORef inventoryRef
     let pageContent = renderText (renderInventory inventory)
     html pageContent
+  delete "/inventory/:id" $ do
+    itemIdStr <- param "id"
+    let maybeItemId = readMaybe itemIdStr :: Maybe Int
+    case maybeItemId of
+      Nothing -> do
+        status badRequest400
+        json $ object ["error" .= ("Invalid ID format" :: String)]
+      Just itemId -> do
+        liftIO $ putStrLn $ "Deleting item with ID: " ++ show itemId
+        liftIO $ do
+          inventory <- readIORef inventoryRef
+          let updatedInventory = removeItem itemId inventory
+          writeIORef inventoryRef updatedInventory
+        -- TODO Should also save updated inventory to disk. But not for every
+        -- request?
+        inventory <- liftIO $ readIORef inventoryRef
+        json inventory
