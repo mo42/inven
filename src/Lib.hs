@@ -387,6 +387,13 @@ renderInventory items = html_ $ do
     script_ [src_ "script.js"] ("" :: T.Text)
   body_ $ do
     h1_ "Inventory"
+    div_ [class_ "search-bar-container"] $ do
+      input_ [ type_ "text"
+             , id_ "search"
+             , placeholder_ "Search inventory..."
+             , oninput_ "handleSearch()"
+             ]
+      button_ [id_ "search-btn", onclick_ "handleSearch()"] "Search"
     div_ [class_ "grid-container"] $ do
       mapM_ renderItem items
 
