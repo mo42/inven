@@ -26,7 +26,6 @@ source-repository head
 library
   exposed-modules:
       Lib
-      Style
   other-modules:
       Paths_inven
   hs-source-dirs:

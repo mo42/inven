@@ -45,7 +45,6 @@ import Network.HTTP.Types (badRequest400)
 import Network.Wai.Middleware.Static
 import Options.Applicative hiding (value)
 import qualified Options.Applicative as OA
-import Style
 import System.Directory (doesFileExist, renameFile)
 import System.Environment.XDG.BaseDir
 import System.FilePath (takeExtension, (</>))
@@ -384,7 +383,8 @@ renderInventory :: [Item] -> Html ()
 renderInventory items = html_ $ do
   head_ $ do
     title_ "Inventory Overview"
-    style_ invenGridStyle
+    link_ [rel_ "stylesheet", href_ "style.css"]
+    script_ [src_ "script.js"] ("" :: T.Text)
   body_ $ do
     h1_ "Inventory"
     div_ [class_ "grid-container"] $ do
