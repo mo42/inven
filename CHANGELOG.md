@@ -59,3 +59,4 @@ and this project adheres to the
 - subcommand for a web server that serves inventory information
 - show the item's images in the served page
 - responsive grid overview of items with images
+- search bar to dynamically filter items
