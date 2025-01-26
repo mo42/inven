@@ -32,6 +32,7 @@ dependencies:
 - scotty
 - lucid
 - wai-middleware-static
+- http-types
 
 ghc-options:
 - -Wall
