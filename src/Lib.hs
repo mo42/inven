@@ -403,6 +403,9 @@ serveInventory inventoryRef staticDir = scotty 4200 $ do
     inventory <- liftIO $ readIORef inventoryRef
     let pageContent = renderText (renderInventory inventory)
     html pageContent
+  get "/inventory" $ do
+    inventory <- liftIO $ readIORef inventoryRef
+    json inventory
   delete "/inventory/:id" $ do
     itemIdStr <- param "id"
     let maybeItemId = readMaybe itemIdStr :: Maybe Int
