@@ -21,6 +21,7 @@ module Lib
   , appendToPath
   , formatTable
   , moveFile
+  , copyFileTo
   , renderInventory
   , serveInventory
   )
@@ -45,7 +46,7 @@ import Network.HTTP.Types (badRequest400)
 import Network.Wai.Middleware.Static
 import Options.Applicative hiding (value)
 import qualified Options.Applicative as OA
-import System.Directory (doesFileExist, renameFile)
+import System.Directory (doesFileExist, renameFile, copyFile)
 import System.Environment.XDG.BaseDir
 import System.FilePath (takeExtension, (</>))
 import Text.Layout.Table
@@ -226,6 +227,16 @@ moveFile (Just srcPath) newFileName = do
       let destPath = invenDir </> newFileName ++ extension
       renameFile srcPath destPath
     else putStrLn "Warning: photo does not exist"
+
+copyFileTo :: FilePath -> IO ()
+copyFileTo fileName = do
+  fileExists <- doesFileExist fileName
+  invenDir <- getUserDataDir "inven"
+  if fileExists
+    then do
+      let destPath = invenDir </> fileName
+      copyFile fileName destPath
+    else putStrLn "Warning: file does not exist"
 
 loadInventory :: IO [Item]
 loadInventory = do
