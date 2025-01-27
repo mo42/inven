@@ -410,8 +410,11 @@ renderInventory items = html_ $ do
 
 renderItem :: Item -> Html ()
 renderItem item = div_ [class_ "grid-item"] $ do
-  h3_ $ toHtml $ description item
-  img_ [src_ $ T.pack $ printf "%d.jpg" $ itemId item, alt_ "Item image", class_ "item-image"]
+  div_ [class_ "header-container"] $ do
+    h3_ [class_ "item-description"] $ toHtml $ description item
+    button_ [class_ "delete-btn", id_ (pack $ printf "delete-%d" (itemId item)), onclick_ (pack $ printf "deleteItem(%d)" (itemId item))] $ do
+      toHtml $ pack "🗑️"
+  img_ [src_ $ pack $ printf "%d.jpg" $ itemId item, alt_ "Item image", class_ "item-image"]
   p_ $ toHtml $ pack $ printf "#%d item from %s category at location %s" (quantity item) (category item) (location item)
 
 serveInventory :: IORef [Item] -> String -> IO ()
@@ -437,7 +440,4 @@ serveInventory inventoryRef staticDir = scotty 4200 $ do
           inventory <- readIORef inventoryRef
           let updatedInventory = removeItem itemId inventory
           writeIORef inventoryRef updatedInventory
-        -- TODO Should also save updated inventory to disk. But not for every
-        -- request?
-        inventory <- liftIO $ readIORef inventoryRef
-        json inventory
+          saveInventory inventory
