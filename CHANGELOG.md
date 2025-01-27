@@ -60,3 +60,4 @@ and this project adheres to the
 - show the item's images in the served page
 - responsive grid overview of items with images
 - search bar to dynamically filter items
+- delete items from web app

@@ -10,3 +10,19 @@ function handleSearch() {
     }
   });
 }
+
+function deleteItem(itemId) {
+  fetch('/inventory/' + itemId, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then(response => {
+    if (response.ok) {
+      document.getElementById('delete-' + itemId).closest('.grid-item')
+        .remove();
+    } else {
+      alert('Failed to delete item');
+    }
+  });
+}
