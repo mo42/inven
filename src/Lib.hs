@@ -399,6 +399,7 @@ renderInventory items = html_ $ do
   body_ $ do
     h1_ "Inventory"
     div_ [class_ "search-bar-container"] $ do
+      a_ [href_ "/add", class_ "add-btn"] "➕Add Item"
       input_ [ type_ "text"
              , id_ "search"
              , placeholder_ "Search inventory..."
@@ -417,6 +418,19 @@ renderItem item = div_ [class_ "grid-item"] $ do
   img_ [src_ $ pack $ printf "%d.jpg" $ itemId item, alt_ "Item image", class_ "item-image"]
   p_ $ toHtml $ pack $ printf "#%d item from %s category at location %s" (quantity item) (category item) (location item)
 
+renderAddItemForm :: Html ()
+renderAddItemForm = html_ $ do
+  head_ $ do
+    title_ "Add Item"
+    link_ [rel_ "stylesheet", href_ "style.css"]
+    script_ [src_ "script.js"] ("" :: T.Text)
+  body_ $ do
+    h1_ "Add New Item"
+    form_ [action_ "/add", method_ "post", onsubmit_ "addItem()"] $ do
+      input_ [type_ "text", name_ "description", id_ "item-description", required_ "true", placeholder_ "Description"]
+      button_ [type_ "submit"] "Add Item"
+    a_ [href_ "/"] "Back to Inventory"
+
 serveInventory :: IORef [Item] -> String -> IO ()
 serveInventory inventoryRef staticDir = scotty 4200 $ do
   middleware $ staticPolicy (addBase staticDir)
@@ -424,6 +438,18 @@ serveInventory inventoryRef staticDir = scotty 4200 $ do
     inventory <- liftIO $ readIORef inventoryRef
     let pageContent = renderText (renderInventory inventory)
     html pageContent
+  get "/add" $ do
+    let addItemForm = renderText renderAddItemForm
+    html addItemForm
+  post "/add" $ do
+    desc <- param "description"
+    liftIO $ do
+      date <- parseDateOrCurrent ""
+      inventory <- readIORef inventoryRef
+      let (updatedInventory, _) = addItem desc Nothing Nothing date 1 Nothing Nothing Nothing Nothing inventory
+      writeIORef inventoryRef updatedInventory
+      saveInventory inventory
+    redirect "/"
   get "/inventory" $ do
     inventory <- liftIO $ readIORef inventoryRef
     json inventory

@@ -61,3 +61,4 @@ and this project adheres to the
 - responsive grid overview of items with images
 - search bar to dynamically filter items
 - delete items from web app
+- add item from web app (desc. only)

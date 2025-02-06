@@ -26,3 +26,23 @@ function deleteItem(itemId) {
     }
   });
 }
+
+function addItem() {
+  const description = document.querySelector("#item-description").value;
+
+  const data = {
+    description: description
+  };
+
+  fetch('/add', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .catch((error) => {
+    console.error('Error:', error);
+  });
+}
