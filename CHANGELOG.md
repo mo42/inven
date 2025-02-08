@@ -62,3 +62,4 @@ and this project adheres to the
 - search bar to dynamically filter items
 - delete items from web app
 - add item from web app (desc. only)
+- Dockerfile to create and deploy image

@@ -18,6 +18,17 @@ stack install
 If you have `.local/bin` in your PATH environment variable, you should be able
 to run the `inven` command.
 
+### Docker
+
+You can create a Docker image by running `docker build -t inven-app`.
+
+To have a persistent state, I use the volume option to mount the directory from the host:
+```sh
+docker run -p 4200:4200 \
+    -v ~/.local/share/inven:/home/invenuser/.local/share/inven:rw,Z
+    inven-app
+```
+
 ## Usage
 
 ```
