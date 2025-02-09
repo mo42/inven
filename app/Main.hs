@@ -64,6 +64,5 @@ main = do
       staticDir <- getUserDataDir "inven"
       copyFileTo "style.css"
       copyFileTo "script.js"
-      inventory <- loadInventory
       inventoryRef <- newIORef inventory
       serveInventory inventoryRef staticDir

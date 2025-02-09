@@ -46,7 +46,7 @@ import Network.HTTP.Types (badRequest400)
 import Network.Wai.Middleware.Static
 import Options.Applicative hiding (value)
 import qualified Options.Applicative as OA
-import System.Directory (doesFileExist, renameFile, copyFile)
+import System.Directory (copyFile, doesFileExist, renameFile)
 import System.Environment.XDG.BaseDir
 import System.FilePath (takeExtension, (</>))
 import Text.Layout.Table
@@ -369,24 +369,20 @@ formatTable items =
     $ headerLine : map itemLine items
 
 matchCaseInsensitive :: String -> String -> Bool
-matchCaseInsensitive s regex = map toLower s =~ map toLower regex
+matchCaseInsensitive s pattern = map toLower s =~ map toLower pattern
 
 matchCaseInsensitiveMaybeString :: Maybe String -> String -> Bool
-matchCaseInsensitiveMaybeString (Just s) regex = matchCaseInsensitive s regex
+matchCaseInsensitiveMaybeString (Just s) pattern = matchCaseInsensitive s pattern
 matchCaseInsensitiveMaybeString Nothing _ = False
 
 matchExpression :: Item -> String -> Bool
-matchExpression item regex = matchCaseInsensitive (description item) regex || matchCaseInsensitiveMaybeString (category item) regex
+matchExpression item pattern = matchCaseInsensitive (description item) pattern || matchCaseInsensitiveMaybeString (category item) pattern
 
 findItemsByRegex :: String -> ([Item] -> [Item])
-findItemsByRegex regex = filter (`matchExpression` regex)
+findItemsByRegex pattern = filter (`matchExpression` pattern)
 
-findExpiredItems :: Day -> ([Item] -> [Item])
-findExpiredItems today = filter $ isExpiredItem today
- where
-  isExpiredItem today item = case expiry item of
-    Just day -> day <= today
-    Nothing -> False
+findExpiredItems :: Day -> [Item] -> [Item]
+findExpiredItems today = filter (maybe False (<= today) . expiry)
 
 -- Serving inventory in web browser
 
@@ -399,11 +395,12 @@ renderInventory items = html_ $ do
   body_ $ do
     h1_ "Inventory"
     div_ [class_ "search-bar-container"] $ do
-      input_ [ type_ "text"
-             , id_ "search"
-             , placeholder_ "Search inventory..."
-             , oninput_ "handleSearch()"
-             ]
+      input_
+        [ type_ "text"
+        , id_ "search"
+        , placeholder_ "Search inventory..."
+        , oninput_ "handleSearch()"
+        ]
       button_ [id_ "search-btn", onclick_ "handleSearch()"] "Search"
       a_ [href_ "/add", id_ "add-btn"] "➕ Add"
     div_ [class_ "grid-container"] $ do
@@ -444,9 +441,9 @@ serveInventory inventoryRef staticDir = scotty 4200 $ do
   post "/add" $ do
     desc <- param "description"
     liftIO $ do
-      date <- parseDateOrCurrent ""
+      curDate <- parseDateOrCurrent ""
       inventory <- readIORef inventoryRef
-      let (updatedInventory, _) = addItem desc Nothing Nothing date 1 Nothing Nothing Nothing Nothing inventory
+      let (updatedInventory, _) = addItem desc Nothing Nothing curDate 1 Nothing Nothing Nothing Nothing inventory
       writeIORef inventoryRef updatedInventory
       saveInventory inventory
     redirect "/"
@@ -460,10 +457,10 @@ serveInventory inventoryRef staticDir = scotty 4200 $ do
       Nothing -> do
         status badRequest400
         json $ object ["error" .= ("Invalid ID format" :: String)]
-      Just itemId -> do
-        liftIO $ putStrLn $ "Deleting item with ID: " ++ show itemId
+      Just delItemId -> do
+        liftIO $ putStrLn $ "Deleting item with ID " ++ show delItemId
         liftIO $ do
           inventory <- readIORef inventoryRef
-          let updatedInventory = removeItem itemId inventory
+          let updatedInventory = removeItem delItemId inventory
           writeIORef inventoryRef updatedInventory
           saveInventory inventory

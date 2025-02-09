@@ -1,5 +1,5 @@
 # inven
-Keep track of all your stuff from the command line. Manage your physical belongings with `inven` 📦📜
+Keep track of all your stuff. Manage your physical belongings with `inven` 📦📜
 
 Example view in browser when running `inven serve`:
 ![Example Inventory in Browser](example.png)
@@ -24,8 +24,9 @@ You can create a Docker image by running `docker build -t inven-app`.
 
 To have a persistent state, I use the volume option to mount the directory from the host:
 ```sh
-docker run -p 4200:4200 \
-    -v ~/.local/share/inven:/home/invenuser/.local/share/inven:rw,Z
+docker run
+    -p 4200:4200 \
+    -v ~/.local/share/inven:/home/invenuser/.local/share/inven:rw,Z \
     inven-app
 ```
 
