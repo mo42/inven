@@ -12,19 +12,21 @@ function handleSearch() {
 }
 
 function deleteItem(itemId) {
-  fetch('/inventory/' + itemId, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => {
-    if (response.ok) {
-      document.getElementById('delete-' + itemId).closest('.grid-item')
-        .remove();
-    } else {
-      alert('Failed to delete item');
-    }
-  });
+  if (confirm('Are you sure you want to delete the item with ID ' + itemId + '?')) {
+    fetch('/inventory/' + itemId, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => {
+      if (response.ok) {
+        document.getElementById('delete-' + itemId).closest('.grid-item')
+          .remove();
+      } else {
+        alert('Failed to delete item');
+      }
+    });
+  }
 }
 
 function addItem() {
