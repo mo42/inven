@@ -425,6 +425,12 @@ renderAddItemForm = html_ $ do
     h1_ "Add New Item"
     form_ [action_ "/add", method_ "post", onsubmit_ "addItem()"] $ do
       input_ [type_ "text", name_ "description", id_ "item-description", required_ "true", placeholder_ "Description"]
+      input_ [type_ "number", name_ "value", id_ "item-value", required_ "false", placeholder_ "Value", step_ "0.01"]
+      input_ [type_ "number", name_ "price", id_ "item-price", required_ "false", placeholder_ "Price", step_ "0.01"]
+      input_ [type_ "number", name_ "quantity", id_ "item-quantity", required_ "false", placeholder_ "Quantity", step_ "1"]
+      input_ [type_ "text", name_ "category", id_ "item-category", required_ "false", placeholder_ "Category"]
+      input_ [type_ "text", name_ "container", id_ "item-container", required_ "false", placeholder_ "Container"]
+      input_ [type_ "text", name_ "location", id_ "item-location", required_ "false", placeholder_ "Location"]
       button_ [type_ "submit"] "Add Item"
     a_ [href_ "/"] "Back to Inventory"
 
@@ -440,10 +446,19 @@ serveInventory inventoryRef staticDir = scotty 4200 $ do
     html addItemForm
   post "/add" $ do
     desc <- param "description"
+    valStr <- param "value"
+    let val = readMaybe valStr :: Maybe Float
+    priceStr <- param "price"
+    let price = readMaybe priceStr :: Maybe Float
+    qtyStr <- param "quantity"
+    let qty = fromMaybe 1 (readMaybe qtyStr :: Maybe Int)
+    cat <- (Just <$> param "category") `rescue` (\_ -> return Nothing)
+    cont <- (Just <$> param "container") `rescue` (\_ -> return Nothing)
+    loc <- (Just <$> param "location") `rescue` (\_ -> return Nothing)
     liftIO $ do
       curDate <- parseDateOrCurrent ""
       inventory <- readIORef inventoryRef
-      let (updatedInventory, _) = addItem desc Nothing Nothing curDate 1 Nothing Nothing Nothing Nothing inventory
+      let (updatedInventory, _) = addItem desc val price curDate qty cat cont loc Nothing inventory
       writeIORef inventoryRef updatedInventory
       saveInventory inventory
     redirect "/"

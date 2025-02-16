@@ -63,3 +63,4 @@ and this project adheres to the
 - delete items from web app
 - add item from web app (desc. only)
 - Dockerfile to create and deploy image
+- add item with more attributes from web app
