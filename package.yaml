@@ -1,10 +1,10 @@
 name:                inven
-version:             1.0.0
+version:             1.0.1
 github:              "githubuser/inven"
 license:             MIT
 author:              "Moritz"
 maintainer:          "me@mo42.de"
-copyright:           "2023 Moritz"
+copyright:           "2023, 2024, 2025 Moritz"
 
 extra-source-files:
 - README.md

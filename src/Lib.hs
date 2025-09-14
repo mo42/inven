@@ -33,7 +33,7 @@ import qualified Data.ByteString.Char8 as DBS
 import Data.Char (toLower)
 import Data.Function (on)
 import Data.IORef
-import Data.List (elemIndex)
+import Data.List (elemIndex, find)
 import Data.Maybe
 import Data.Text (pack)
 import qualified Data.Text as T
@@ -42,7 +42,7 @@ import Data.Yaml
 import Data.Yaml.Pretty
 import GHC.Generics
 import Lucid
-import Network.HTTP.Types (badRequest400)
+import Network.HTTP.Types (badRequest400, notFound404)
 import Network.Wai.Middleware.Static
 import Options.Applicative hiding (value)
 import qualified Options.Applicative as OA
@@ -410,6 +410,12 @@ renderItem :: Item -> Html ()
 renderItem item = div_ [class_ "grid-item"] $ do
   div_ [class_ "header-container"] $ do
     h3_ [class_ "item-description"] $ toHtml $ description item
+    a_
+      [ class_ "edit-btn"
+      , href_ (pack $ printf "/edit/%d" (itemId item))
+      , title_ "Edit item"
+      ]
+      "✏️"
     button_ [class_ "delete-btn", id_ (pack $ printf "delete-%d" (itemId item)), onclick_ (pack $ printf "deleteItem(%d)" (itemId item))] $ do
       toHtml $ pack "🗑️"
   img_ [src_ $ pack $ printf "%d.jpg" $ itemId item, alt_ "Item image", class_ "item-image"]
@@ -419,8 +425,8 @@ renderAddItemForm :: Html ()
 renderAddItemForm = html_ $ do
   head_ $ do
     title_ "Add Item"
-    link_ [rel_ "stylesheet", href_ "style.css"]
-    script_ [src_ "script.js"] ("" :: T.Text)
+    link_ [rel_ "stylesheet", href_ "/style.css"]
+    script_ [src_ "/script.js"] ("" :: T.Text)
   body_ $ do
     h1_ "Add New Item"
     form_ [action_ "/add", method_ "post", onsubmit_ "addItem()"] $ do
@@ -432,6 +438,28 @@ renderAddItemForm = html_ $ do
       input_ [type_ "text", name_ "container", id_ "item-container", required_ "false", placeholder_ "Container"]
       input_ [type_ "text", name_ "location", id_ "item-location", required_ "false", placeholder_ "Location"]
       button_ [type_ "submit"] "Add Item"
+    a_ [href_ "/"] "Back to Inventory"
+
+updateItem :: ItemId -> (Item -> Item) -> [Item] -> [Item]
+updateItem targetId f = map (\it -> if itemId it == targetId then f it else it)
+
+renderEditItemForm :: Item -> Html ()
+renderEditItemForm item = html_ $ do
+  head_ $ do
+    title_ "Edit Item"
+    link_ [rel_ "stylesheet", href_ "../style.css"]
+    script_ [src_ "../script.js"] ("" :: T.Text)
+  body_ $ do
+    h1_ "Edit Item"
+    form_ [action_ ("/edit/" <> (T.pack . show . itemId) item), method_ "post"] $ do
+      input_ [type_ "text", name_ "description", id_ "item-description", value_ (T.pack $ description item)]
+      input_ [type_ "number", name_ "value", id_ "item-value", value_ (maybe "" (T.pack . show) (value item)), step_ "0.01"]
+      input_ [type_ "number", name_ "price", id_ "item-price", value_ (maybe "" (T.pack . show) (price item)), step_ "0.01"]
+      input_ [type_ "number", name_ "quantity", id_ "item-quantity", value_ (T.pack $ show $ quantity item), step_ "1"]
+      input_ [type_ "text", name_ "category", id_ "item-category", value_ (maybe "" T.pack (category item))]
+      input_ [type_ "text", name_ "container", id_ "item-container", value_ (maybe "" T.pack (container item))]
+      input_ [type_ "text", name_ "location", id_ "item-location", value_ (maybe "" T.pack (location item))]
+      button_ [type_ "submit"] "Update Item"
     a_ [href_ "/"] "Back to Inventory"
 
 serveInventory :: IORef [Item] -> String -> IO ()
@@ -479,3 +507,57 @@ serveInventory inventoryRef staticDir = scotty 4200 $ do
           let updatedInventory = removeItem delItemId inventory
           writeIORef inventoryRef updatedInventory
           saveInventory inventory
+  get "/edit/:id" $ do
+    itemIdStr <- param "id"
+    let maybeItemId = readMaybe itemIdStr :: Maybe Int
+    case maybeItemId of
+      Nothing -> do
+        status badRequest400
+        html "Invalid item ID"
+      Just eid -> do
+        inventory <- liftIO $ readIORef inventoryRef
+        case find (\it -> itemId it == eid) inventory of
+          Nothing -> do
+            status notFound404
+            html "Item not found"
+          Just item -> do
+            let formHtml = renderText (renderEditItemForm item)
+            html formHtml
+  post "/edit/:id" $ do
+    itemIdStr <- param "id"
+    let maybeItemId = readMaybe itemIdStr :: Maybe Int
+    case maybeItemId of
+      Nothing -> do
+        status badRequest400
+        json $ object ["error" .= ("Invalid ID format" :: String)]
+      Just eid -> do
+        desc <- param "description"
+        valStr <- param "value"
+        let val = readMaybe valStr :: Maybe Float
+        priceStr <- param "price"
+        let price = readMaybe priceStr :: Maybe Float
+        qtyStr <- param "quantity"
+        let qty = fromMaybe 1 (readMaybe qtyStr :: Maybe Int)
+        cat <- (Just <$> param "category") `rescue` (\_ -> return Nothing)
+        cont <- (Just <$> param "container") `rescue` (\_ -> return Nothing)
+        loc <- (Just <$> param "location") `rescue` (\_ -> return Nothing)
+        liftIO $ do
+          modifyIORef
+            inventoryRef
+            ( updateItem
+                eid
+                ( \it ->
+                    it
+                      { description = desc
+                      , value = val
+                      , price = price
+                      , quantity = qty
+                      , category = cat
+                      , container = cont
+                      , location = loc
+                      }
+                )
+            )
+          inv <- readIORef inventoryRef
+          saveInventory inv
+        redirect "/"

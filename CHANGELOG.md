@@ -53,7 +53,9 @@ and this project adheres to the
 - Show items as a formatted table
 - List command to show all items
 
-## Unreleased
+## Web app with photos, add, delete, edit, and search
+
+### 1.0.1 - 2025-09-14
 
 - subcommand to add photo of item to library
 - subcommand for a web server that serves inventory information
@@ -64,3 +66,4 @@ and this project adheres to the
 - add item from web app (desc. only)
 - Dockerfile to create and deploy image
 - add item with more attributes from web app
+- edit existing items from web app
