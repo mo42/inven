@@ -32,11 +32,11 @@ function deleteItem(itemId) {
 function addItem() {
   const data = {
     description: document.querySelector("#item-description").value,
-    value: document.querySelector("#item-value").value
-    price: document.querySelector("#item-price").value
-    category: document.querySelector("#item-category").value
-    container: document.querySelector("#item-container").value
-    location: document.querySelector("#item-location").value
+    value: document.querySelector("#item-value").value,
+    price: document.querySelector("#item-price").value,
+    category: document.querySelector("#item-category").value,
+    container: document.querySelector("#item-container").value,
+    location: document.querySelector("#item-location").value,
   };
 
   fetch('/add', {

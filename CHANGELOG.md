@@ -57,13 +57,19 @@ and this project adheres to the
 
 ### 1.0.1 - 2025-09-14
 
-- subcommand to add photo of item to library
-- subcommand for a web server that serves inventory information
-- show the item's images in the served page
-- responsive grid overview of items with images
-- search bar to dynamically filter items
-- delete items from web app
-- add item from web app (desc. only)
+- Subcommand to add photo of item to library
+- Subcommand for a web server that serves inventory information
+- Show the item's images in the served page
+- Responsive grid overview of items with images
+- Search bar to dynamically filter items
+- Delete items from web app
+- Add item from web app (desc. only)
 - Dockerfile to create and deploy image
-- add item with more attributes from web app
-- edit existing items from web app
+- Add item with more attributes from web app
+- Edit existing items from web app
+
+## Unreleased
+
+### 1.0.2 - 2025-09-27
+
+- Fix syntax in callback
