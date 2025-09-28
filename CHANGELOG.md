@@ -73,3 +73,4 @@ and this project adheres to the
 ### 1.0.2 - 2025-09-27
 
 - Fix syntax in callback
+- Improved UI of edit and add pages

@@ -429,16 +429,30 @@ renderAddItemForm = html_ $ do
     script_ [src_ "/script.js"] ("" :: T.Text)
   body_ $ do
     h1_ "Add New Item"
-    form_ [action_ "/add", method_ "post", onsubmit_ "addItem()"] $ do
-      input_ [type_ "text", name_ "description", id_ "item-description", required_ "true", placeholder_ "Description"]
-      input_ [type_ "number", name_ "value", id_ "item-value", required_ "false", placeholder_ "Value", step_ "0.01"]
-      input_ [type_ "number", name_ "price", id_ "item-price", required_ "false", placeholder_ "Price", step_ "0.01"]
-      input_ [type_ "number", name_ "quantity", id_ "item-quantity", required_ "false", placeholder_ "Quantity", step_ "1"]
-      input_ [type_ "text", name_ "category", id_ "item-category", required_ "false", placeholder_ "Category"]
-      input_ [type_ "text", name_ "container", id_ "item-container", required_ "false", placeholder_ "Container"]
-      input_ [type_ "text", name_ "location", id_ "item-location", required_ "false", placeholder_ "Location"]
-      button_ [type_ "submit"] "Add Item"
-    a_ [href_ "/"] "Back to Inventory"
+    form_ [action_ "/add", method_ "post", onsubmit_ "addItem()", class_ "edit-form"] $ do
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-description"] "Description"
+        input_ [type_ "text", name_ "description", id_ "item-description", required_ "true", placeholder_ "Enter description"]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-value"] "Value"
+        input_ [type_ "number", name_ "value", id_ "item-value", placeholder_ "0.00", step_ "0.01"]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-price"] "Price"
+        input_ [type_ "number", name_ "price", id_ "item-price", placeholder_ "0.00", step_ "0.01"]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-quantity"] "Quantity"
+        input_ [type_ "number", name_ "quantity", id_ "item-quantity", placeholder_ "1", step_ "1"]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-category"] "Category"
+        input_ [type_ "text", name_ "category", id_ "item-category", placeholder_ "e.g. Electronics"]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-container"] "Container"
+        input_ [type_ "text", name_ "container", id_ "item-container", placeholder_ "e.g. Box A"]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-location"] "Location"
+        input_ [type_ "text", name_ "location", id_ "item-location", placeholder_ "e.g. Warehouse 1"]
+      button_ [type_ "submit", class_ "submit-btn"] "Add Item"
+    a_ [href_ "/", class_ "back-link"] "← Back to Inventory"
 
 updateItem :: ItemId -> (Item -> Item) -> [Item] -> [Item]
 updateItem targetId f = map (\it -> if itemId it == targetId then f it else it)
@@ -451,16 +465,30 @@ renderEditItemForm item = html_ $ do
     script_ [src_ "../script.js"] ("" :: T.Text)
   body_ $ do
     h1_ "Edit Item"
-    form_ [action_ ("/edit/" <> (T.pack . show . itemId) item), method_ "post"] $ do
-      input_ [type_ "text", name_ "description", id_ "item-description", value_ (T.pack $ description item)]
-      input_ [type_ "number", name_ "value", id_ "item-value", value_ (maybe "" (T.pack . show) (value item)), step_ "0.01"]
-      input_ [type_ "number", name_ "price", id_ "item-price", value_ (maybe "" (T.pack . show) (price item)), step_ "0.01"]
-      input_ [type_ "number", name_ "quantity", id_ "item-quantity", value_ (T.pack $ show $ quantity item), step_ "1"]
-      input_ [type_ "text", name_ "category", id_ "item-category", value_ (maybe "" T.pack (category item))]
-      input_ [type_ "text", name_ "container", id_ "item-container", value_ (maybe "" T.pack (container item))]
-      input_ [type_ "text", name_ "location", id_ "item-location", value_ (maybe "" T.pack (location item))]
-      button_ [type_ "submit"] "Update Item"
-    a_ [href_ "/"] "Back to Inventory"
+    form_ [action_ ("/edit/" <> (T.pack . show . itemId) item), method_ "post", class_ "edit-form"] $ do
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-description"] "Description"
+        input_ [type_ "text", name_ "description", id_ "item-description", value_ (T.pack $ description item)]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-value"] "Value"
+        input_ [type_ "number", name_ "value", id_ "item-value", value_ (maybe "" (T.pack . show) (value item)), step_ "0.01"]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-price"] "Price"
+        input_ [type_ "number", name_ "price", id_ "item-price", value_ (maybe "" (T.pack . show) (price item)), step_ "0.01"]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-quantity"] "Quantity"
+        input_ [type_ "number", name_ "quantity", id_ "item-quantity", value_ (T.pack $ show $ quantity item), step_ "1"]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-category"] "Category"
+        input_ [type_ "text", name_ "category", id_ "item-category", value_ (maybe "" T.pack (category item))]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-container"] "Container"
+        input_ [type_ "text", name_ "container", id_ "item-container", value_ (maybe "" T.pack (container item))]
+      div_ [class_ "form-group"] $ do
+        label_ [for_ "item-location"] "Location"
+        input_ [type_ "text", name_ "location", id_ "item-location", value_ (maybe "" T.pack (location item))]
+      button_ [type_ "submit", class_ "submit-btn"] "Update Item"
+    a_ [href_ "/", class_ "back-link"] "← Back to Inventory"
 
 serveInventory :: IORef [Item] -> String -> IO ()
 serveInventory inventoryRef staticDir = scotty 4200 $ do
