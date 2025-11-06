@@ -74,3 +74,4 @@ and this project adheres to the
 
 - Fix syntax in callback
 - Improved UI of edit and add pages
+- Support fuzzy search in web app
