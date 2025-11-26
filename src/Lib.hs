@@ -58,7 +58,7 @@ import Web.Scotty
 type ItemId = Int
 
 data Command
-  = Add String String ItemId (Maybe Float) (Maybe Float) (Maybe String) (Maybe String) (Maybe String) (Maybe String) (Maybe FilePath)
+  = Add String String Int (Maybe Float) (Maybe Float) (Maybe String) (Maybe String) (Maybe String) (Maybe String) (Maybe FilePath)
   | Remove ItemId
   | Value
   | Count
