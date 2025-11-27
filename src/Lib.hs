@@ -520,7 +520,7 @@ serveInventory inventoryRef staticDir = scotty 4200 $ do
       inventory <- readIORef inventoryRef
       let (updatedInventory, _) = addItem desc val price curDate qty cat cont loc Nothing inventory
       writeIORef inventoryRef updatedInventory
-      saveInventory inventory
+      saveInventory updatedInventory
     redirect "/"
   get "/inventory" $ do
     inventory <- liftIO $ readIORef inventoryRef
